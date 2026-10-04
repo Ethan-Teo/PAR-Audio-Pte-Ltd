@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en-SG">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visit &amp; Contact — PAR Audio Pte Ltd</title>
+  <meta name="description" content="Contact PAR Audio Pte Ltd in Singapore for Wharfedale and Audiolab enquiries, listening sessions, delivery and installation.">
+  <meta name="theme-color" content="#111214">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="contact">
+  <a class="visually-hidden" href="#main">Skip to content</a>
+  <header id="site-header"></header>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><span>Visit &amp; Contact</span></nav>
+        <h1>Talk to a specialist</h1>
+        <p>Questions about a product, a system or whether something will fit? Our team knows every Wharfedale and Audiolab model to the millimetre.</p>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="contact-grid">
+        <aside class="contact-card" id="contact-card"></aside>
+
+        <form class="form-card" id="contact-form" style="margin-top:0" novalidate>
+          <h2>Send us a message</h2>
+          <p>We usually reply within one working day.</p>
+          <div class="form-grid">
+            <div class="field"><label for="c-name">Full name</label><input id="c-name" name="name" autocomplete="name" required><p class="err">Please enter your name.</p></div>
+            <div class="field"><label for="c-phone">Mobile number <span class="muted" style="font-weight:400">(optional)</span></label><input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"></div>
+            <div class="field full"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" required><p class="err">Please enter a valid email address.</p></div>
+            <div class="field"><label for="c-topic">Topic</label>
+              <select id="c-topic" name="topic">
+                <option value="enquiry">Product enquiry</option>
+                <option value="listening">Book a listening session</option>
+                <option value="delivery">Delivery &amp; installation</option>
+                <option value="warranty">After-sales &amp; warranty</option>
+                <option value="other">Something else</option>
+              </select>
+            </div>
+            <div class="field"><label for="c-product">Product <span class="muted" style="font-weight:400">(optional)</span></label><select id="c-product" name="product"></select></div>
+            <div class="field full" id="c-date-field" hidden><label for="c-date">Preferred date for your session</label><input id="c-date" name="date" type="date"></div>
+            <div class="field full"><label for="c-msg">Message</label><textarea id="c-msg" name="message" required placeholder="Tell us about your room, your current system or the space you need it to fit (in mm)."></textarea><p class="err">Please enter a message.</p></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary btn-lg" type="submit">Send message</button>
+            <p id="c-status" aria-live="polite">Your email app will open with your message ready to send.</p>
+          </div>
+        </form>
+      </div>
+
+      <div class="policy-grid">
+        <section class="policy" id="delivery">
+          <h3>Delivery &amp; installation</h3>
+          <p id="delivery-copy"></p>
+          <ul>
+            <li>Delivery across mainland Singapore</li>
+            <li>Optional positioning, connection and set-up</li>
+            <li>Packaging removed on request</li>
+            <li>Collection available by appointment</li>
+          </ul>
+        </section>
+        <section class="policy" id="warranty">
+          <h3>Warranty &amp; returns</h3>
+          <p>Every product we sell is genuine, new stock supplied with the manufacturer's warranty. If something isn't right, contact us. We'll arrange inspection and handle the claim on your behalf.</p>
+          <ul>
+            <li>Keep your invoice as proof of purchase</li>
+            <li>Report transit damage within 48 hours of delivery</li>
+            <li>Unopened items may be exchanged; please contact us first</li>
+          </ul>
+        </section>
+        <section class="policy" id="listening">
+          <h3>Listening sessions</h3>
+          <p>Hear the speakers and electronics you're considering before you buy. Sessions are by appointment so the room is yours. Bring your own music on a phone, USB drive or CD.</p>
+          <ul>
+            <li>Compare models side by side</li>
+            <li>Advice on matching amplifiers and speakers</li>
+            <li>Room and placement guidance</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/render.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/pages/contact.js"></script>
+</body>
+</html>
