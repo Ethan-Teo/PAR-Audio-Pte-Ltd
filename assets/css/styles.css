@@ -873,3 +873,52 @@ body.has-compare-bar .toast-wrap { bottom: 90px; }
 .pdp-stage .prod-photo, .zoom .prod-photo { position: absolute; inset: 48px; width: calc(100% - 96px); height: calc(100% - 96px); }
 .zoom .prod-photo { position: static; flex: 1; min-height: 0; width: 100%; height: 100%; }
 @media (max-width: 720px) { .pdp-stage .prod-photo { inset: 24px; width: calc(100% - 48px); height: calc(100% - 48px); } }
+
+/* ---------------------------------------------------------------------
+   Brands menu & "Find all brands" page
+   --------------------------------------------------------------------- */
+.mega-brand { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; font-family: var(--f-display); font-size: 24px; color: var(--ink); }
+.mega-brand span { font-family: var(--f-body); font-size: 12px; color: var(--muted); }
+.mega-brand:hover { color: var(--accent-strong); }
+.mega-all { display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 10px; padding: 24px; min-height: 220px; }
+.mega-feature.mega-all span { position: static; }
+.mega-feature.mega-all > span:first-child { font-family: var(--f-display); font-size: 30px; line-height: 1.1; }
+.mega-feature.mega-all .mega-all-list { font-family: var(--f-body); font-size: 14px; color: var(--muted); }
+.mega-feature.mega-all .link-arrow { font-family: var(--f-body); font-size: 14px; }
+
+.brand-index { display: flex; flex-wrap: wrap; gap: 10px; padding: 28px 0 8px; }
+.brand-index a { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); font-weight: 600; font-size: 14px; }
+.brand-index a:hover { border-color: var(--ink); }
+.brand-index span { font-family: var(--f-mono); font-size: 12px; font-weight: 500; color: var(--muted); }
+.brands-list { display: grid; gap: 56px; padding: 28px 0 96px; }
+.brand-block { scroll-margin-top: calc(var(--header-h) + 60px); }
+.brand-hero {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; align-items: center;
+  padding: 40px; border-radius: var(--radius); background: linear-gradient(160deg, #22252a, #0f1012 70%); color: var(--on-dark);
+}
+.brand-hero .eyebrow { color: #d6b98a; }
+.brand-hero h2 { font-family: var(--f-display); font-size: clamp(36px, 4vw, 52px); font-weight: 400; letter-spacing: -.02em; margin: 10px 0 14px; }
+.brand-blurb { color: var(--on-dark-muted); max-width: 480px; }
+.brand-stats { display: flex; gap: 18px; margin: 18px 0 24px; font-size: 13px; color: var(--on-dark-muted); }
+.brand-stats b { color: #fff; }
+.brand-hero .btn-dark { background: #fff; color: var(--ink); }
+.brand-hero .btn-dark:hover { background: var(--accent-soft); }
+.brand-visual { height: 280px; }
+.brand-visual svg { width: 100%; height: 100%; }
+.brand-visual .lu-ground { stroke: rgba(255,255,255,.2); }
+.range-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; }
+.range-card { display: flex; flex-direction: column; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); overflow: hidden; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.range-card:hover { border-color: var(--line-2); box-shadow: var(--shadow); transform: translateY(-2px); }
+.rc-media { display: block; height: 170px; padding: 14px; background: linear-gradient(180deg, var(--stage-a), var(--stage-b)); }
+.rc-media svg, .rc-media img { width: 100%; height: 100%; }
+.rc-body { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 18px; }
+.rc-body strong { font-family: var(--f-display); font-size: 22px; font-weight: 400; }
+.rc-body > span { font-size: 13.5px; color: var(--muted); }
+.rc-body em { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-style: normal; font-size: 13px; font-weight: 600; }
+.rc-body em svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+@media (max-width: 980px) {
+  .brand-hero { grid-template-columns: 1fr; padding: 28px 22px; }
+  .brand-visual { height: 200px; }
+  .mega-brand { font-size: 20px; }
+  .mega-all { display: flex; min-height: 0; padding: 16px; grid-column: 1 / -1; }
+}

@@ -179,12 +179,15 @@
         <a href="${href}" class="nav-link">${label}</a>
         ${menu ? `<div class="mega"><div class="mega-inner">${menu}</div></div>` : ''}
       </li>`;
-    const wMenu = `<div><p class="mega-title">Wharfedale ranges</p><ul>${seriesLinks('Wharfedale')}</ul></div>
-      <div><p class="mega-title">Loudspeakers</p><ul>${catLinks('Speakers')}</ul></div>
-      <a class="mega-feature" href="${productUrl(byId('elysian-4r'))}">${R.thumb(byId('elysian-4r'), 'walnut', { cls: 'mega-svg', pad: 0.06, view: 'angle' })}<span><em>New</em>Elysian 4R</span></a>`;
-    const aMenu = `<div><p class="mega-title">Audiolab ranges</p><ul>${seriesLinks('Audiolab')}</ul></div>
+    const brandNames = Object.keys(window.BRANDS);
+    const bMenu = brandNames.map((b) => `<div>
+        <a class="mega-brand" href="shop.html?brand=${encodeURIComponent(b)}">${esc(b)} <span>${PRODUCTS.filter((p) => p.brand === b).length} models</span></a>
+        <ul>${seriesLinks(b)}</ul></div>`).join('') +
+      `<a class="mega-feature mega-all" href="brands.html"><span><em>${brandNames.length} brands</em>Find all brands</span>
+        <span class="mega-all-list">${brandNames.map(esc).join(' · ')}</span><span class="link-arrow">View all brands ${ICONS.arrow}</span></a>`;
+    const sMenu = `<div><p class="mega-title">Loudspeakers</p><ul>${catLinks('Speakers')}</ul></div>
       <div><p class="mega-title">Electronics</p><ul>${catLinks('Electronics')}</ul></div>
-      <a class="mega-feature" href="${productUrl(byId('audiolab-9000a'))}">${R.thumb(byId('audiolab-9000a'), 'silver', { cls: 'mega-svg', pad: 0.06, view: 'angle' })}<span><em>Flagship</em>9000A</span></a>`;
+      <a class="mega-feature" href="${productUrl(byId('elysian-4r'))}">${media(byId('elysian-4r'), 'walnut', { cls: 'mega-svg', pad: 0.06, view: 'angle' })}<span><em>New</em>Elysian 4R</span></a>`;
 
     el.innerHTML = `
       <div class="topbar"><div class="container topbar-inner">
@@ -197,9 +200,8 @@
         ${logo()}
         <nav id="primary-nav" class="primary-nav" aria-label="Primary">
           <ul class="nav-list">
-            ${navItem('wharfedale', 'Wharfedale', 'shop.html?brand=Wharfedale', wMenu)}
-            ${navItem('audiolab', 'Audiolab', 'shop.html?brand=Audiolab', aMenu)}
-            ${navItem('shop', 'Shop all', 'shop.html')}
+            ${navItem('brands', 'Brands', 'brands.html', bMenu)}
+            ${navItem('shop', 'Shop all', 'shop.html', sMenu)}
             ${navItem('compare', 'Compare', 'compare.html')}
             ${navItem('contact', 'Visit &amp; Contact', 'contact.html')}
           </ul>
@@ -245,6 +247,7 @@
           <li><a href="contact.html#delivery">Delivery &amp; installation</a></li>
           <li><a href="contact.html#warranty">Warranty &amp; returns</a></li>
           <li><a href="contact.html#listening">Book a listening session</a></li>
+          <li><a href="brands.html">All brands</a></li>
           <li><a href="compare.html">Compare products</a></li>
           <li><a href="contact.html">Contact us</a></li>
         </ul></div>

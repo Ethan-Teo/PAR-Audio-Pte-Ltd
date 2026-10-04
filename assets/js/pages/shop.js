@@ -23,7 +23,7 @@
   const group = qp.get('group');
   if (group) CATEGORIES.filter((c) => c.group === group).forEach((c) => S.cat.add(c.id));
 
-  init(S.brand.size === 1 ? [...S.brand][0].toLowerCase() : 'shop');
+  init(S.brand.size === 1 ? 'brands' : 'shop');
 
   /* ------------------------------------------------------------------ */
   /* Matching                                                            */
@@ -147,7 +147,10 @@
     else if (S.maxh || S.maxw || S.maxd) { title = 'Products that fit your space'; intro = 'Every product below fits within the maximum dimensions you entered.'; }
     $('#shop-title').textContent = title;
     $('#shop-intro').textContent = intro;
-    $('#crumb').textContent = title === 'All products' ? 'Shop' : title;
+    const brandCrumb = b || (s && Object.keys(BRANDS).find((k) => BRANDS[k].series[s]));
+    $('#crumbs').innerHTML = brandCrumb
+      ? `<a href="brands.html">Brands</a><span aria-hidden="true">/</span>${s ? `<a href="shop.html?brand=${encodeURIComponent(brandCrumb)}">${esc(brandCrumb)}</a><span aria-hidden="true">/</span><span>${esc(s)}</span>` : `<span>${esc(brandCrumb)}</span>`}`
+      : `<span>${esc(title === 'All products' ? 'Shop' : title)}</span>`;
     document.title = `${title} — PAR Audio Pte Ltd`;
 
     // URL

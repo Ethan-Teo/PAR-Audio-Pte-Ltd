@@ -8,6 +8,7 @@ It is a static site — plain HTML, CSS and JavaScript with no build step and no
 
 | Page | What it does |
 | --- | --- |
+| `brands.html` | **Find all brands**: every brand with its ranges; each leads to that brand's full product list. The header's **Brands** menu links here. New brands added to `BRANDS` in `data.js` appear automatically |
 | `index.html` | Home: to-scale hero lineup, brand overviews, categories, featured products, **“Will it fit?”** dimension finder, series directory, services |
 | `shop.html` | Full catalogue with filters for brand, category, range, price and **maximum H × W × D (mm)**, plus sorting by price, name, height, width and weight. Filters are kept in the URL, so filtered views can be shared |
 | `product.html?id=…` | Product detail: key dimensions, finish swatches, package options (e.g. with stands), quantity, add to cart, **front + side dimension drawing in mm**, full specification table, related products |

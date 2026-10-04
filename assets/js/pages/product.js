@@ -6,7 +6,7 @@
   const SITE = window.SITE;
 
   const p = byId(params().get('id'));
-  PAR.init(p ? p.brand.toLowerCase() : 'shop');
+  PAR.init(p ? 'brands' : 'shop');
   const root = $('#pdp-root');
 
   if (!p) {
@@ -39,6 +39,7 @@
   root.innerHTML = `
     <nav class="breadcrumb" aria-label="Breadcrumb" style="padding-top:24px">
       <a href="index.html">Home</a><span aria-hidden="true">/</span>
+      <a href="brands.html">Brands</a><span aria-hidden="true">/</span>
       <a href="shop.html?brand=${p.brand}">${p.brand}</a><span aria-hidden="true">/</span>
       <a href="shop.html?brand=${p.brand}&series=${encodeURIComponent(p.series)}">${esc(p.series)}</a><span aria-hidden="true">/</span>
       <span aria-current="page">${esc(p.name)}</span>
