@@ -139,7 +139,7 @@
       const { p, opts } = lineName(i);
       const unit = priceOf(p, i.variant);
       return `<div class="cart-line">
-        <a class="cart-thumb" href="${productUrl(p)}" aria-hidden="true" tabindex="-1">${R.thumb(p, i.finish, { pad: 0.06 })}</a>
+        <a class="cart-thumb" href="${productUrl(p)}" aria-hidden="true" tabindex="-1">${PAR.media(p, i.finish, { pad: 0.06, view: 'angle', reflect: false })}</a>
         <div>
           <p class="eyebrow" style="font-size:11px;color:var(--muted)">${esc(p.brand)} · ${esc(p.series)}</p>
           <h3><a href="${productUrl(p)}">${esc(p.name)}</a></h3>

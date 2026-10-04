@@ -39,7 +39,7 @@ python3 -m http.server 8000
 2. **Prices:** the SGD prices are **indicative**. They were converted from published UK RRPs (about S$1.72 to £1, rounded) and include 9% GST. Some models had no published UK price and were estimated: Super Linton, the Linton/Super Linton stand packages, Linton Stands, Diamond Active A1/A2, the subwoofers, Omnia and M-DAC Mini/nano. Set your own selling prices in `data.js`. The Airedale Heritage is listed as *Price on request*.
 3. **Specifications:** the dimensions and specs were compiled from manufacturer and retailer listings via web search. The official Wharfedale/Audiolab websites could not be reached while this was built, so please spot-check against the official spec sheets. A few weights were not published and show as “—” (Diamond 12.1i–12.4i, Aura C, Linton Stands). Finish names are generic; adjust them to the finishes you actually stock.
 4. **Policies:** delivery (free over S$500, otherwise S$30, set via `freeDeliveryThreshold` and `deliveryFee`), warranty, returns and listening-session wording is standard placeholder copy in `contact.html`, `product.js` and `home.js`. Make sure it matches how PAR Audio operates.
-5. **Product images:** products are shown as clean, to-scale vector illustrations generated from their dimensions (`assets/js/render.js`). If you have rights to official product photography, it can be added alongside them.
+5. **Product photos:** add real photos by putting the files in `assets/img/products/` and listing them against the product id in `assets/js/photos.js`, e.g. `'elysian-4r': ['elysian-4r-1.jpg', 'elysian-4r-2.jpg']`. The first photo becomes the main image everywhere (shop cards, product page, cart, search, compare); the second appears when hovering a shop card. Photos on a white background blend into the page. Use images you have the rights to, such as the dealer/press image packs supplied by Wharfedale and Audiolab (IAG). Until a product has photos, it shows the built-in to-scale illustrations. These are still offered alongside the photos as extra views: angle, front, grille, side, a size guide next to a 12" LP sleeve, and the dimension drawing.
 6. **Payments:** checkout produces an order request (email/WhatsApp) rather than taking card payments. To take payments online, connect a provider such as Stripe or HitPay.
 
 ## Structure
@@ -49,9 +49,11 @@ index.html  shop.html  product.html  compare.html  cart.html  contact.html
 assets/
   css/styles.css         Design system and all page styles (responsive)
   js/data.js             Site settings + the full product catalogue (edit here)
+  js/photos.js           Product photo list (add your photos here)
   js/render.js           To-scale product illustrations, dimension drawings, lineups
   js/app.js              Header/footer, cart, compare, search, product cards
   js/pages/*.js          Page-specific behaviour
+  img/products/          Product photo files
   img/favicon.svg        Browser-tab icon (PAR globe mark)
   img/par-audio-logo.svg Full PAR Audio Pte Ltd logo (vector), for print, email or social use
 ```

@@ -71,7 +71,7 @@
     const [id, fin] = rep[c.id];
     const n = PRODUCTS.filter((p) => p.category === c.id).length;
     return `<a class="cat-tile" href="shop.html?cat=${c.id}">
-      <div class="ct-media">${R.thumb(byId(id), fin, { pad: 0.08 })}</div>
+      <div class="ct-media">${window.PAR.media(byId(id), fin, { pad: 0.08, view: 'angle' })}</div>
       <div class="ct-body"><strong>${esc(c.name)}</strong><span>${n} model${n === 1 ? '' : 's'}</span></div>
     </a>`;
   }).join('');

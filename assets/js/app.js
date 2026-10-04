@@ -25,6 +25,14 @@
   const finishLabel = (f) => (R.FINISHES[f] ? R.FINISHES[f].label : f);
   const variantOf = (p, vid) => (p.variants ? p.variants.find((v) => v.id === vid) || p.variants[0] : null);
   const priceOf = (p, vid) => { const v = variantOf(p, vid); return v ? v.price : p.price; };
+  const photos = (p) => ((window.PHOTOS || {})[p.id] || []).map((f) => (/^(https?:|\/|assets\/)/.test(f) ? f : `assets/img/products/${f}`));
+  /** A product's photo if one is listed in photos.js, otherwise its to-scale illustration. */
+  function media(p, fin, opts) {
+    opts = opts || {};
+    const ph = photos(p)[opts.index || 0];
+    if (ph) return `<img class="${opts.cls || 'prod-img'} prod-photo" src="${esc(ph)}" alt="${esc(p.brand + ' ' + p.name)}" loading="lazy" decoding="async">`;
+    return R.thumb(p, fin, opts);
+  }
 
   /* Storage — tolerant of private mode / blocked storage */
   const store = {
@@ -173,10 +181,10 @@
       </li>`;
     const wMenu = `<div><p class="mega-title">Wharfedale ranges</p><ul>${seriesLinks('Wharfedale')}</ul></div>
       <div><p class="mega-title">Loudspeakers</p><ul>${catLinks('Speakers')}</ul></div>
-      <a class="mega-feature" href="${productUrl(byId('elysian-4r'))}">${R.thumb(byId('elysian-4r'), 'walnut', { cls: 'mega-svg', pad: 0.06 })}<span><em>New</em>Elysian 4R</span></a>`;
+      <a class="mega-feature" href="${productUrl(byId('elysian-4r'))}">${R.thumb(byId('elysian-4r'), 'walnut', { cls: 'mega-svg', pad: 0.06, view: 'angle' })}<span><em>New</em>Elysian 4R</span></a>`;
     const aMenu = `<div><p class="mega-title">Audiolab ranges</p><ul>${seriesLinks('Audiolab')}</ul></div>
       <div><p class="mega-title">Electronics</p><ul>${catLinks('Electronics')}</ul></div>
-      <a class="mega-feature" href="${productUrl(byId('audiolab-9000a'))}">${R.thumb(byId('audiolab-9000a'), 'silver', { cls: 'mega-svg', pad: 0.06 })}<span><em>Flagship</em>9000A</span></a>`;
+      <a class="mega-feature" href="${productUrl(byId('audiolab-9000a'))}">${R.thumb(byId('audiolab-9000a'), 'silver', { cls: 'mega-svg', pad: 0.06, view: 'angle' })}<span><em>Flagship</em>9000A</span></a>`;
 
     el.innerHTML = `
       <div class="topbar"><div class="container topbar-inner">
@@ -286,7 +294,7 @@
       const list = q ? search(q).slice(0, 8) : PRODUCTS.filter((p) => p.featured).slice(0, 8);
       results.innerHTML = `<p class="search-hint">${q ? `${search(q).length} result${search(q).length === 1 ? '' : 's'}` : 'Popular right now'}</p>` +
         (list.length ? `<ul>${list.map((p) => `<li><a href="${productUrl(p)}">
-          <span class="sr-thumb">${R.thumb(p, null, { cls: 'sr-svg', pad: 0.08 })}</span>
+          <span class="sr-thumb">${media(p, null, { cls: 'sr-svg', pad: 0.08, view: 'angle', reflect: false })}</span>
           <span class="sr-text"><span class="sr-name">${esc(p.brand)} ${esc(p.name)}</span><span class="sr-meta">${esc(p.type)} · ${dimsText(p)}</span></span>
           <span class="sr-price">${p.price == null ? 'On request' : money(p.price)}</span></a></li>`).join('')}</ul>`
           : '<p class="search-empty">No products match your search.</p>');
@@ -334,7 +342,7 @@
       document.body.classList.toggle('has-compare-bar', !bar.hidden);
       $('#compare-bar-items').innerHTML = ids.map((id) => {
         const p = byId(id);
-        return `<div class="cb-item"><span class="cb-thumb">${R.thumb(p, null, { cls: 'cb-svg', pad: 0.06 })}</span><span class="cb-name">${esc(p.name)}</span>
+        return `<div class="cb-item"><span class="cb-thumb">${media(p, null, { cls: 'cb-svg', pad: 0.06, view: 'angle', reflect: false })}</span><span class="cb-name">${esc(p.name)}</span>
           <button type="button" class="cb-x" data-compare="${p.id}" aria-label="Remove ${esc(p.name)} from comparison">${ICONS.close}</button></div>`;
       }).join('') + (ids.length < CMP_MAX ? `<div class="cb-hint">Select up to ${CMP_MAX} products</div>` : '');
       $$('[data-compare-n]').forEach((el) => { el.textContent = `(${ids.length})`; });
@@ -362,7 +370,8 @@
     return `<article class="card">
       <a class="card-media" href="${productUrl(p)}" tabindex="-1" aria-hidden="true">
         <span class="card-badges">${badgeHTML(p)}</span>
-        ${R.thumb(p, null, { cls: 'card-svg' })}
+        <span class="cm-view cm-angle">${media(p, null, { cls: 'card-svg', view: 'angle' })}</span>
+        <span class="cm-view cm-front">${photos(p)[1] ? media(p, null, { cls: 'card-svg', index: 1 }) : photos(p)[0] ? media(p, null, { cls: 'card-svg' }) : R.thumb(p, null, { cls: 'card-svg' })}</span>
       </a>
       <div class="card-body">
         <p class="eyebrow">${esc(p.brand)} · ${esc(p.series)}</p>
@@ -410,6 +419,6 @@
 
   window.PAR = {
     $, $$, esc, money, byId, catById, params, productUrl, unitLabel, dimsText, weightText, finishLabel,
-    variantOf, priceOf, cart, compare, search, card, priceHTML, badgeHTML, toast, init, ICONS, syncCompareUI, store,
+    variantOf, priceOf, photos, media, cart, compare, search, card, priceHTML, badgeHTML, toast, init, ICONS, syncCompareUI, store,
   };
 })();

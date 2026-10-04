@@ -74,7 +74,7 @@
           <colgroup><col style="width:200px">${items.map(() => '<col>').join('')}</colgroup>
           <thead><tr><th scope="col"><span class="visually-hidden">Specification</span></th>
             ${items.map((p) => `<th scope="col"><div class="cmp-head">
-              <a class="cmp-thumb" href="${productUrl(p)}" tabindex="-1" aria-hidden="true">${R.thumb(p, null, { pad: 0.06 })}</a>
+              <a class="cmp-thumb" href="${productUrl(p)}" tabindex="-1" aria-hidden="true">${PAR.media(p, null, { pad: 0.06, view: 'angle' })}</a>
               <span class="eyebrow" style="font-size:10.5px;color:var(--muted)">${esc(p.brand)} · ${esc(p.series)}</span>
               <a class="name" href="${productUrl(p)}">${esc(p.name)}</a>
               ${p.price == null ? '<span class="price price-request">Price on request</span>' : `<span class="price">${money(p.price)} <small>${unitLabel(p)}</small></span>`}

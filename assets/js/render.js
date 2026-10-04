@@ -83,7 +83,10 @@
       out.push({ s: 'circle', cx, cy, r: R, role: 'frame' });
       out.push({ s: 'circle', cx, cy, r: R * 0.86, role: 'surround' });
       out.push({ s: 'circle', cx, cy, r: R * 0.74, role: 'cone' });
+      out.push({ s: 'circle', cx, cy, r: R * 0.58, role: 'ridge' });
+      out.push({ s: 'circle', cx, cy, r: R * 0.43, role: 'ridge' });
       out.push({ s: 'circle', cx, cy, r: R * 0.26, role: 'cap' });
+      out.push({ s: 'circle', cx: cx - R * 0.09, cy: cy - R * 0.09, r: R * 0.075, role: 'spec' });
       if (item.d >= 110) {
         for (let i = 0; i < 4; i++) {
           const a = Math.PI / 4 + (i * Math.PI) / 2;
@@ -94,6 +97,7 @@
       out.push({ s: 'circle', cx, cy, r: item.w / 2, role: 'tw-plate' });
       out.push({ s: 'circle', cx, cy, r: item.d / 2 + item.d * 0.2, role: 'tw-ring' });
       out.push({ s: 'circle', cx, cy, r: item.d / 2, role: 'tw-dome' });
+      out.push({ s: 'circle', cx: cx - item.d * 0.15, cy: cy - item.d * 0.15, r: item.d * 0.12, role: 'spec' });
     } else if (item.t === 'amt') {
       out.push({ s: 'rect', x: cx - item.w / 2, y: cy - item.h / 2, w: item.w, h: item.h, rx: Math.min(item.w, item.h) * 0.12, role: 'amt-plate' });
       out.push({ s: 'rect', x: cx - item.fw / 2, y: cy - item.fh / 2, w: item.fw, h: item.fh, rx: 1.5, role: 'amt-film' });
@@ -204,13 +208,16 @@
   function knob(out, cx, cy, d) {
     out.push({ s: 'circle', cx, cy, r: d / 2, role: 'knob-ring' });
     out.push({ s: 'circle', cx, cy, r: d / 2 * 0.86, role: 'knob' });
+    out.push({ s: 'circle', cx, cy, r: d / 2 * 0.93, role: 'knurl' });
+    out.push({ s: 'circle', cx: cx - d * 0.16, cy: cy - d * 0.16, r: d * 0.09, role: 'spec' });
     out.push({ s: 'line', x1: cx, y1: cy - d * 0.36, x2: cx, y2: cy - d * 0.2, role: 'knob-mark' });
   }
 
   function display(out, x, y, w, h) {
     out.push({ s: 'rect', x, y, w, h, rx: Math.min(h * 0.12, 3), role: 'display' });
-    out.push({ s: 'rect', x: x + w * 0.1, y: y + h * 0.28, w: w * 0.5, h: h * 0.16, rx: 0.5, role: 'display-text' });
-    out.push({ s: 'rect', x: x + w * 0.1, y: y + h * 0.58, w: w * 0.32, h: h * 0.1, rx: 0.5, role: 'display-dim' });
+    out.push({ s: 'text', x: x + w * 0.08, y: y + h * 0.5, text: w > h * 3.2 ? 'OPTICAL 1' : 'USB', size: h * 0.3, anchor: 'start', role: 'disp-txt' });
+    out.push({ s: 'text', x: x + w * 0.92, y: y + h * 0.5, text: '-32.5dB', size: h * 0.3, anchor: 'end', role: 'disp-val' });
+    out.push({ s: 'rect', x: x + w * 0.08, y: y + h * 0.68, w: w * 0.5, h: h * 0.09, rx: 0.5, role: 'display-dim' });
   }
 
   function layoutComponent(p, mode) {
@@ -303,6 +310,7 @@
     if (sh.s === 'rect') return `<rect x="${r1(sh.x)}" y="${r1(sh.y)}" width="${r1(sh.w)}" height="${r1(sh.h)}" rx="${r1(sh.rx || 0)}" ${attrs}/>`;
     if (sh.s === 'circle') return `<circle cx="${r1(sh.cx)}" cy="${r1(sh.cy)}" r="${r1(sh.r)}" ${attrs}/>`;
     if (sh.s === 'line') return `<line x1="${r1(sh.x1)}" y1="${r1(sh.y1)}" x2="${r1(sh.x2)}" y2="${r1(sh.y2)}" ${attrs}/>`;
+    if (sh.s === 'poly') return `<polygon points="${sh.pts.map((q) => r1(q[0]) + ',' + r1(q[1])).join(' ')}" ${attrs}/>`;
     if (sh.s === 'text') return `<text x="${r1(sh.x)}" y="${r1(sh.y)}" font-size="${r1(sh.size)}" text-anchor="${sh.anchor}" ${attrs}>${esc(sh.text)}</text>`;
     return '';
   }
@@ -319,7 +327,9 @@
         <radialGradient id="${id}knob" cx=".38" cy=".32" r=".8">
         <stop offset="0" stop-color="${light ? '#ffffff' : '#5c5d62'}"/>
         <stop offset=".55" stop-color="${light ? '#d3d6d9' : '#2c2d31'}"/>
-        <stop offset="1" stop-color="${light ? '#9da1a6' : '#141518'}"/></radialGradient>`;
+        <stop offset="1" stop-color="${light ? '#9da1a6' : '#141518'}"/></radialGradient>
+        <pattern id="${id}brush" width="400" height="1.6" patternUnits="userSpaceOnUse">
+        <rect width="400" height=".55" fill="${light ? '#fff' : '#fff'}" fill-opacity="${light ? 0.35 : 0.035}"/></pattern>`;
     } else {
       d += `<linearGradient id="${id}cab" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stop-color="${f.b}"/><stop offset=".1" stop-color="${f.a}"/>
@@ -336,6 +346,10 @@
       <stop offset="0" stop-color="#4a4b50"/><stop offset="1" stop-color="#121214"/></radialGradient>
       <radialGradient id="${id}cap" cx=".35" cy=".3" r=".8">
       <stop offset="0" stop-color="#77787e"/><stop offset="1" stop-color="#1a1a1d"/></radialGradient>
+      <linearGradient id="${id}shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".1"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></linearGradient>
+      <linearGradient id="${id}topl" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity=".04"/></linearGradient>
       <radialGradient id="${id}dome" cx=".35" cy=".3" r=".8">
       <stop offset="0" stop-color="#8b8c92"/><stop offset="1" stop-color="#1c1c1f"/></radialGradient>
       <pattern id="${id}weave" width="4" height="4" patternUnits="userSpaceOnUse">
@@ -375,7 +389,25 @@
         case 'badge': s += geom(sh, 'fill="#c8b28a"'); break;
         case 'foot': s += geom(sh, `fill="${f.metal ? '#55585c' : '#0d0d0e'}"`); break;
         case 'metal': s += geom(sh, 'fill="#1f1f22"') + geom(sh, 'fill="none" stroke="#fff" stroke-opacity=".08"'); break;
-        case 'body': s += geom(sh, `fill="url(#${id}body)" stroke="#000" stroke-opacity="${f.metal ? 0.18 : 0.5}" stroke-width=".6"`); break;
+        case 'body': s += geom(sh, `fill="url(#${id}body)" stroke="#000" stroke-opacity="${f.metal ? 0.18 : 0.5}" stroke-width=".6"`) + geom(sh, `fill="url(#${id}brush)"`); break;
+        case 'ridge': s += geom(sh, 'fill="none" stroke="#fff" stroke-opacity=".06" stroke-width=".8"'); break;
+        case 'spec': s += geom(sh, 'fill="#fff" fill-opacity=".16"'); break;
+        case 'knurl': s += geom(sh, `fill="none" stroke="${f.metal ? '#7d8186' : '#000'}" stroke-opacity=".7" stroke-width="${r1(Math.max(sh.r * 0.12, 0.6))}" stroke-dasharray="${r1(Math.max(sh.r * 0.05, 0.4))} ${r1(Math.max(sh.r * 0.05, 0.4))}"`); break;
+        case 'disp-txt': case 'disp-val': s += geom(sh, `fill="${sh.role === 'disp-val' ? '#9fd3ff' : '#eef4fa'}" font-family="'JetBrains Mono', ui-monospace, monospace" font-weight="500"`); break;
+        case 'grille':
+          s += geom(sh, 'fill="#2a2b2e"') + geom(sh, `fill="url(#${id}weave)"`) + geom(sh, `fill="url(#${id}weave)"`);
+          s += geom(sh, 'fill="none" stroke="#000" stroke-opacity=".45" stroke-width="2"');
+          break;
+        case 'cab-top': s += geom(sh, `fill="${f.a}"`) + (f.wood ? geom(sh, `fill="url(#${id}grain)"`) : '') + geom(sh, `fill="url(#${id}topl)"`); break;
+        case 'cab-side': s += geom(sh, `fill="${f.b}"`) + (f.wood ? geom(sh, `fill="url(#${id}grain)"`) : '') + geom(sh, `fill="url(#${id}shade)"`) + (f.gloss ? geom(sh, `fill="url(#${id}gloss)"`) : ''); break;
+        case 'body-top': s += geom(sh, `fill="${f.metal ? '#dadde1' : '#2a2b2f'}"`) + geom(sh, `fill="url(#${id}topl)"`); break;
+        case 'body-side': s += geom(sh, `fill="${f.metal ? '#a7abb1' : '#141517'}"`) + geom(sh, `fill="url(#${id}shade)"`); break;
+        case 'plinth-top': case 'metal-top': s += geom(sh, 'fill="#2c2c30"'); break;
+        case 'plinth-side': case 'metal-side': s += geom(sh, 'fill="#101012"'); break;
+        case 'lp-sleeve': s += geom(sh, 'fill="#ece5d6" stroke="#000" stroke-opacity=".12"'); break;
+        case 'lp-art': s += geom(sh, 'fill="#a47c45" fill-opacity=".85"'); break;
+        case 'lp-label': s += geom(sh, 'fill="#1c1c1f"'); break;
+        case 'lp-text': s += geom(sh, 'fill="#1c1c1f" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="700"'); break;
         case 'edge': s += geom(sh, `stroke="#fff" stroke-opacity="${f.metal ? 0.9 : 0.12}" stroke-width=".8"`); break;
         case 'knob-ring': s += geom(sh, `fill="${f.metal ? '#8f9398' : '#0b0b0d'}"`); break;
         case 'knob': s += geom(sh, `fill="url(#${id}knob)"`); break;
@@ -394,7 +426,7 @@
     return s;
   }
 
-  const LINE_SKIP = new Set(['pleat', 'display-text', 'display-dim', 'brand', 'screw', 'cone', 'edge', 'led', 'knob-mark', 'tw-ring']);
+  const LINE_SKIP = new Set(['pleat', 'display-text', 'display-dim', 'brand', 'screw', 'cone', 'edge', 'led', 'knob-mark', 'tw-ring', 'ridge', 'spec', 'knurl', 'disp-txt', 'disp-val']);
   function paintLine(shapes) {
     let s = '';
     shapes.forEach((sh) => {
@@ -404,32 +436,142 @@
     return s;
   }
 
-  function isComponent(p) { return p.render.kind === 'component'; }
+  function isComponent(p) { return p.render.kind === 'component' || p.render.kind === 'lp'; }
+
+  /* ------------------------------------------------------------------ */
+  /* Views: front, angle (3/4 with true depth), grille, side             */
+  /* ------------------------------------------------------------------ */
+  const ANGLE_K = 0.46;
+  const ANGLE_A = (32 * Math.PI) / 180;
+  const DRIVER_ROLES = new Set(['frame', 'surround', 'cone', 'ridge', 'cap', 'spec', 'screw', 'tw-plate', 'tw-ring', 'tw-dome', 'amt-plate', 'amt-film', 'pleat']);
+
+  function shift(sh, dx, dy) {
+    const o = Object.assign({}, sh);
+    if (o.s === 'rect' || o.s === 'text') { o.x += dx; o.y += dy; }
+    else if (o.s === 'circle') { o.cx += dx; o.cy += dy; }
+    else if (o.s === 'line') { o.x1 += dx; o.x2 += dx; o.y1 += dy; o.y2 += dy; }
+    else if (o.s === 'poly') o.pts = o.pts.map(([x, y]) => [x + dx, y + dy]);
+    return o;
+  }
+
+  function layoutLP() {
+    const S = 314;
+    return [
+      { s: 'rect', x: 0, y: 0, w: S, h: S, rx: 2, role: 'lp-sleeve' },
+      { s: 'circle', cx: S * 0.5, cy: S * 0.46, r: S * 0.3, role: 'lp-art' },
+      { s: 'circle', cx: S * 0.5, cy: S * 0.46, r: S * 0.1, role: 'lp-label' },
+      { s: 'text', x: S * 0.5, y: S * 0.9, text: '12" LP', size: S * 0.07, anchor: 'middle', role: 'lp-text' },
+    ];
+  }
+  const LP = { id: 'lp', brand: '', name: '12" LP sleeve', dims: { h: 314, w: 314, d: 3 }, finishes: ['white'], render: { kind: 'lp' } };
+
+  function frontShapes(p) {
+    if (p.render.kind === 'lp') return layoutLP();
+    return layout(p, p.render.face === 'puck' ? 'top' : 'front');
+  }
+
+  /** Returns { shapes, w, h } in mm for the requested view. */
+  function viewShapes(p, view) {
+    const { h: H, w: W, d: D } = p.dims;
+    const puckTop = p.render.face === 'puck';
+    if (view === 'grille' && p.render.kind === 'speaker') {
+      const base = layout(p, 'front');
+      const out = base.filter((sh) => !DRIVER_ROLES.has(sh.role) && sh.role !== 'badge');
+      const baffle = base.find((sh) => sh.role === 'baffle' || sh.role === 'baffle-match');
+      out.push(Object.assign({}, baffle, { role: 'grille' }));
+      base.filter((sh) => sh.role === 'badge').forEach((b) => out.push(b));
+      return { shapes: out, w: W, h: H };
+    }
+    if (view === 'side') {
+      const out = [];
+      if (p.render.kind === 'speaker' || p.render.kind === 'sub') {
+        const front = layout(p, 'front');
+        const plinth = front.find((sh) => sh.role === 'plinth');
+        const cab = front.find((sh) => sh.role === 'cab');
+        out.push({ s: 'rect', x: 0, y: 0, w: D, h: cab.h, rx: cab.rx, role: 'cab-side' });
+        out.push({ s: 'rect', x: 0, y: 0, w: Math.max(D * 0.025, 4), h: cab.h, rx: 1, role: p.render.baffle === 'black' ? 'baffle' : 'cab' });
+        if (plinth) out.push({ s: 'rect', x: 0, y: plinth.y, w: D, h: plinth.h, rx: 2, role: 'plinth' });
+        front.filter((sh) => sh.role === 'foot').forEach((ft) => out.push(Object.assign({}, ft, { x: ft.x / W * D, w: ft.w / W * D })));
+      } else if (p.render.kind === 'stand') {
+        layout(p, 'front').forEach((sh) => out.push(Object.assign({}, sh, { x: sh.x / W * D, w: sh.w / W * D })));
+      } else {
+        const fh = puckTop ? 0 : clamp(H * 0.08, 2, 7);
+        out.push({ s: 'rect', x: 0, y: 0, w: D, h: H - fh, rx: Math.min((H - fh) * 0.08, 5), role: 'body-side' });
+        out.push({ s: 'rect', x: 0, y: 0, w: Math.max(D * 0.035, 3), h: H - fh, rx: 1.5, role: 'body' });
+        if (fh) {
+          out.push({ s: 'rect', x: D * 0.06, y: H - fh, w: D * 0.07, h: fh, rx: 1, role: 'foot' });
+          out.push({ s: 'rect', x: D * 0.87, y: H - fh, w: D * 0.07, h: fh, rx: 1, role: 'foot' });
+        }
+      }
+      return { shapes: out, w: D, h: H };
+    }
+    if (view === 'angle') {
+      const front = puckTop ? layout(p, 'front') : frontShapes(p);
+      const dx = D * ANGLE_K * Math.cos(ANGLE_A);
+      const dy = D * ANGLE_K * Math.sin(ANGLE_A);
+      const boxRoles = { cab: 'cab', plinth: 'plinth', body: 'body', metal: 'metal' };
+      const ext = [];
+      // Extrude boxes, lower ones first so upper boxes overlap them correctly
+      front.filter((sh) => sh.s === 'rect' && boxRoles[sh.role])
+        .sort((a, b) => (b.y + b.h) - (a.y + a.h))
+        .forEach((b) => {
+          const r = boxRoles[b.role];
+          const x0 = b.x, y0 = b.y + dy, x1 = b.x + b.w, y1 = b.y + b.h + dy;
+          ext.push({ s: 'poly', pts: [[x0, y0], [x0 + dx, y0 - dy], [x1 + dx, y0 - dy], [x1, y0]], role: r + '-top' });
+          ext.push({ s: 'poly', pts: [[x1, y0], [x1 + dx, y0 - dy], [x1 + dx, y1 - dy], [x1, y1]], role: r + '-side' });
+        });
+      return { shapes: ext.concat(front.map((sh) => shift(sh, 0, dy))), w: W + dx, h: H + dy };
+    }
+    if (view === 'elev') return { shapes: p.render.kind === 'lp' ? layoutLP() : layout(p, 'front'), w: W, h: H };
+    const h = puckTop ? D : H;
+    return { shapes: frontShapes(p), w: W, h };
+  }
 
   /** Inner SVG group for a product, positioned at (x, y) in mm. */
-  function productGroup(p, fin, x, y, mode) {
+  function productGroup(p, fin, x, y, view) {
     const id = uid('r');
-    const shapes = layout(p, mode);
-    return `<g transform="translate(${r1(x)} ${r1(y)})">${solidDefs(id, fin, isComponent(p))}${paintSolid(shapes, id, fin)}</g>`;
+    const v = viewShapes(p, view || 'front');
+    return `<g transform="translate(${r1(x)} ${r1(y)})">${solidDefs(id, fin, isComponent(p))}${paintSolid(v.shapes, id, fin)}</g>`;
   }
 
   /* ------------------------------------------------------------------ */
   /* Public: product thumbnail                                           */
   /* ------------------------------------------------------------------ */
+  const VIEW_LABELS = { front: 'front view', angle: 'three-quarter view', grille: 'with grille', side: 'side view' };
   function thumb(p, fin, opts) {
     opts = opts || {};
     fin = fin || p.finishes[0];
-    const top = p.render.face === 'puck';
-    const W = p.dims.w;
-    const H = top ? p.dims.d : p.dims.h;
+    const view = opts.view || 'front';
+    if (view === 'scale') return scaleView(p, fin, opts);
+    const v = viewShapes(p, view);
+    const W = v.w, H = v.h;
     const pad = Math.max(W, H) * (opts.pad != null ? opts.pad : 0.1);
     const shadowH = Math.max(W, H) * 0.035;
-    const vb = [-pad, -pad, W + pad * 2, H + pad * 2 + shadowH * 0.5].map(r1).join(' ');
+    const refl = opts.reflect !== false;
+    const reflH = refl ? Math.min(H * 0.22, pad * 0.9) : shadowH * 0.5;
+    const vb = [-pad, -pad, W + pad * 2, H + pad + Math.max(reflH, pad * 0.6)].map(r1).join(' ');
     const sid = uid('s');
-    const shadow = `<defs><radialGradient id="${sid}"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>
-      <ellipse cx="${r1(W / 2)}" cy="${r1(H)}" rx="${r1(W * 0.62)}" ry="${r1(shadowH)}" fill="url(#${sid})"/>`;
-    const label = esc(`${p.brand} ${p.name}, drawn to scale from ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm`);
-    return `<svg class="${opts.cls || 'prod-svg'}" viewBox="${vb}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">${shadow}${productGroup(p, fin, 0, 0, top ? 'top' : 'front')}</svg>`;
+    const id = uid('r');
+    const inner = `${solidDefs(id, fin, isComponent(p))}${paintSolid(v.shapes, id, fin)}`;
+    let defs = `<radialGradient id="${sid}"><stop offset="0" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>`;
+    let reflection = '';
+    if (refl) {
+      defs += `<linearGradient id="${sid}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <mask id="${sid}m" maskUnits="userSpaceOnUse" x="${r1(-pad)}" y="${r1(H)}" width="${r1(W + pad * 2)}" height="${r1(reflH)}"><rect x="${r1(-pad)}" y="${r1(H)}" width="${r1(W + pad * 2)}" height="${r1(reflH)}" fill="url(#${sid}f)"/></mask>`;
+      reflection = `<g mask="url(#${sid}m)"><g transform="translate(0 ${r1(H * 2)}) scale(1 -1)">${inner}</g></g>`;
+    }
+    const cx = view === 'angle' ? W * 0.47 : W / 2;
+    const shadow = `<ellipse cx="${r1(cx)}" cy="${r1(H)}" rx="${r1(W * 0.62)}" ry="${r1(shadowH)}" fill="url(#${sid})"/>`;
+    const label = esc(`${p.brand} ${p.name}, ${VIEW_LABELS[view] || 'view'}, drawn to scale from ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm`);
+    return `<svg class="${opts.cls || 'prod-svg'}" viewBox="${vb}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${reflection}${shadow}<g>${inner}</g></svg>`;
+  }
+
+  /** Product beside a 12-inch LP sleeve (314 × 314 mm) for a sense of real-world size. */
+  function scaleView(p, fin, opts) {
+    return lineup([
+      { parts: [{ p, finish: fin }], label: p.name, sub: `${p.dims.w} mm wide` },
+      { parts: [{ p: LP }], label: '12" LP sleeve', sub: '314 mm wide' },
+    ], { cls: (opts.cls || '') + ' scale-svg', gap: Math.max(p.dims.h, 314) * 0.12, label: `${p.brand} ${p.name} shown next to a 12-inch LP sleeve for scale` });
   }
 
   /* ------------------------------------------------------------------ */
@@ -520,7 +662,7 @@
       let y = maxH;
       it.parts.forEach((pt) => {
         y -= pt.p.dims.h;
-        body += productGroup(pt.p, pt.finish || pt.p.finishes[0], x + (m.w - pt.p.dims.w) / 2, y, 'front');
+        body += productGroup(pt.p, pt.finish || pt.p.finishes[0], x + (m.w - pt.p.dims.w) / 2, y, 'elev');
       });
       if (opts.heights !== false) {
         body += `<text x="${r1(x + m.w / 2)}" y="${r1(maxH - m.h - U * 3)}" font-size="${r1(fs)}" class="lu-h" text-anchor="middle">${m.h} mm</text>`;

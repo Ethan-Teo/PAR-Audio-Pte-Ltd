@@ -14,7 +14,14 @@
     return;
   }
 
-  const S = { finish: p.finishes[0], variant: p.variants ? p.variants[0].id : null, qty: 1, view: 'product' };
+  const PHOTO_LIST = PAR.photos(p);
+  const VIEWS = [
+    ...PHOTO_LIST.map((_, i) => [`photo${i}`, PHOTO_LIST.length > 1 ? `Photo ${i + 1}` : 'Photo']),
+    ['angle', 'Angle'], ['front', 'Front'],
+    ...(p.render.kind === 'speaker' ? [['grille', 'Grille on']] : []),
+    ['side', 'Side'], ['scale', 'Size guide'], ['drawing', 'Dimensions'],
+  ];
+  const S = { finish: p.finishes[0], variant: p.variants ? p.variants[0].id : null, qty: 1, view: PHOTO_LIST.length ? 'photo0' : 'angle' };
   const fullName = `${p.brand} ${p.name}`;
   const cat = catById(p.category);
   const gstOf = (n) => n - n / (1 + SITE.gstRate);
@@ -40,10 +47,7 @@
     <div class="pdp">
       <div class="pdp-media">
         <div class="pdp-stage" id="stage"></div>
-        <div class="pdp-views" role="group" aria-label="Image view">
-          <button type="button" data-view="product" aria-pressed="true">Product view</button>
-          <button type="button" data-view="drawing" aria-pressed="false">Dimension drawing</button>
-        </div>
+        <div class="pdp-gallery" id="gallery" role="group" aria-label="Product images"></div>
       </div>
 
       <div class="pdp-info">
@@ -202,15 +206,55 @@
   /* ------------------------------------------------------------------ */
   /* Dynamic bits                                                        */
   /* ------------------------------------------------------------------ */
+  const CAPTIONS = {
+    angle: 'Three-quarter view showing true depth',
+    front: 'Front view',
+    grille: 'With grille fitted',
+    side: 'Side profile',
+    scale: 'Shown beside a 12" LP sleeve (314 mm) for scale',
+    drawing: 'Dimension drawing, all measurements in mm',
+  };
+  const viewSVG = (v, cls, small) => (v.startsWith('photo')
+    ? `<img class="${cls} prod-photo" src="${esc(PHOTO_LIST[+v.slice(5)])}" alt="${esc(fullName)}" ${small ? 'loading="lazy"' : ''}>`
+    : v === 'drawing'
+    ? R.drawing(p)
+    : R.thumb(p, S.finish, { cls, view: v, pad: small ? 0.08 : 0.06, reflect: !small }));
+
+  function renderGallery() {
+    $('#gallery').innerHTML = VIEWS.map(([v, label]) => `<button type="button" class="g-thumb" data-view="${v}" aria-pressed="${v === S.view}" aria-label="${label}">
+      <span class="g-img">${viewSVG(v, 'g-svg', true)}</span><span class="g-label">${label}</span></button>`).join('');
+  }
+
   function renderStage() {
     const stage = $('#stage');
-    if (S.view === 'drawing') {
-      stage.innerHTML = R.drawing(p);
-    } else {
-      stage.innerHTML = `<span class="card-badges">${badgeHTML(p)}</span>${R.thumb(p, S.finish, { cls: 'pdp-svg', pad: 0.06 })}
-        <span class="scale-note">${ICONS.ruler}Drawn to scale · ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm</span>`;
+    stage.innerHTML = `<span class="card-badges">${badgeHTML(p)}</span>
+      ${viewSVG(S.view, 'pdp-svg')}
+      <button type="button" class="stage-nav prev" data-step-view="-1" aria-label="Previous image">‹</button>
+      <button type="button" class="stage-nav next" data-step-view="1" aria-label="Next image">›</button>
+      <button type="button" class="stage-zoom" data-zoom aria-label="Enlarge image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <span class="scale-note">${ICONS.ruler}${CAPTIONS[S.view] || 'Product photo'} · ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm</span>`;
+    stage.classList.toggle('is-drawing', S.view === 'drawing' || S.view === 'scale');
+    $$('#gallery [data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
+  }
+
+  function stepView(dir) {
+    const i = VIEWS.findIndex(([v]) => v === S.view);
+    S.view = VIEWS[(i + dir + VIEWS.length) % VIEWS.length][0];
+    renderStage();
+  }
+
+  function openZoom() {
+    let dlg = $('#zoom');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'zoom';
+      dlg.className = 'zoom';
+      document.body.appendChild(dlg);
+      dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('[data-zoom-close]')) dlg.close(); });
     }
-    $$('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
+    dlg.innerHTML = `<div class="zoom-inner">${viewSVG(S.view, 'zoom-svg')}<p>${esc(fullName)} · ${CAPTIONS[S.view] || 'Product photo'}</p>
+      <button type="button" class="icon-btn zoom-close" data-zoom-close aria-label="Close">${ICONS.close}</button></div>`;
+    dlg.showModal();
   }
 
   function renderPrice() {
@@ -231,11 +275,14 @@
 
   root.addEventListener('click', (e) => {
     const f = e.target.closest('[data-finish]');
-    if (f) { S.finish = f.dataset.finish; S.view = 'product'; renderOptions(); renderStage(); return; }
+    if (f) { S.finish = f.dataset.finish; if (S.view === 'drawing') S.view = 'angle'; renderOptions(); renderStage(); renderGallery(); return; }
     const v = e.target.closest('[data-variant]');
     if (v) { S.variant = v.dataset.variant; renderOptions(); renderPrice(); return; }
     const vw = e.target.closest('[data-view]');
     if (vw) { S.view = vw.dataset.view; renderStage(); return; }
+    const sv = e.target.closest('[data-step-view]');
+    if (sv) { stepView(+sv.dataset.stepView); return; }
+    if (e.target.closest('[data-zoom]')) { openZoom(); return; }
     const q = e.target.closest('[data-qty]');
     if (q) { const inp = $('#qty'); inp.value = Math.max(1, Math.min(99, (parseInt(inp.value, 10) || 1) + +q.dataset.qty)); return; }
     if (e.target.closest('#add-to-cart')) {
@@ -263,6 +310,12 @@
     });
   });
 
+  $('#stage').addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); stepView(e.key === 'ArrowRight' ? 1 : -1); }
+  });
+  $('#stage').tabIndex = 0;
+  $('#stage').setAttribute('aria-label', 'Product image. Use left and right arrow keys to change view.');
+  renderGallery();
   renderStage();
   renderPrice();
   renderOptions();
