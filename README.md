@@ -52,7 +52,8 @@ assets/
   js/render.js           To-scale product illustrations, dimension drawings, lineups
   js/app.js              Header/footer, cart, compare, search, product cards
   js/pages/*.js          Page-specific behaviour
-  img/favicon.svg
+  img/favicon.svg        Browser-tab icon (PAR globe mark)
+  img/par-audio-logo.svg Full PAR Audio Pte Ltd logo (vector), for print, email or social use
 ```
 
 Wharfedale and Audiolab are trademarks of their respective owners.

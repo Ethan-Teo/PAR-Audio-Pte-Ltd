@@ -132,12 +132,12 @@ a.visually-hidden:focus {
 .header-inner { display: flex; align-items: center; gap: 28px; height: var(--header-h); }
 .nav-toggle { display: none; }
 
-.logo { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); flex-shrink: 0; }
-.logo-mark { width: 36px; height: 36px; }
-.logo-text { display: flex; flex-direction: column; line-height: 1; }
-.logo-word { font-family: var(--f-display); font-size: 22px; font-weight: 600; letter-spacing: .01em; }
-.logo-word span { font-weight: 400; font-style: italic; }
-.logo-sub { margin-top: 4px; font-size: 9.5px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: var(--muted); }
+.logo { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); flex-shrink: 0; }
+.logo-mark { width: 88px; height: 46px; display: block; }
+.logo-sub { font-family: 'Oswald', 'Arial Narrow', 'Roboto Condensed', var(--f-body); font-size: 15px; font-weight: 400; letter-spacing: .34em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+.logo-stacked { flex-direction: column; align-items: center; gap: 8px; }
+.logo-stacked .logo-mark { width: 168px; height: 87px; }
+.logo-stacked .logo-sub { font-size: 17px; letter-spacing: .42em; margin-right: -.42em; }
 
 .primary-nav { flex: 1; }
 .nav-list { display: flex; align-items: center; gap: 4px; }
@@ -171,7 +171,8 @@ a.visually-hidden:focus {
 .mega-feature span { position: absolute; left: 18px; top: 16px; font-family: var(--f-display); font-size: 22px; }
 .mega-feature em { display: block; font-family: var(--f-body); font-style: normal; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-strong); margin-bottom: 4px; }
 
-.header-actions { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.header-actions { display: flex; align-items: center; gap: 2px; margin-left: auto; flex-shrink: 0; }
+.header-main .icon-btn { flex-shrink: 0; }
 
 /* ---------------------------------------------------------------------
    Sections & headings
@@ -629,7 +630,7 @@ a.visually-hidden:focus {
    --------------------------------------------------------------------- */
 #site-footer { background: var(--dark); color: var(--on-dark-muted); padding-top: 72px; }
 #site-footer .logo { color: var(--on-dark); }
-#site-footer .logo-sub { color: var(--on-dark-muted); }
+#site-footer .logo-sub { color: var(--on-dark); }
 .footer-grid { display: grid; grid-template-columns: 1.6fr repeat(4, 1fr); gap: 40px; padding-bottom: 56px; }
 .footer-brand p { margin-top: 18px; font-size: 14px; max-width: 340px; }
 .footer-contact a { color: var(--on-dark); }
@@ -758,6 +759,9 @@ body.has-compare-bar .toast-wrap { bottom: 90px; }
 
 @media (max-width: 720px) {
   :root { --gutter: 16px; }
+  .header-main .logo { flex-direction: column; align-items: center; gap: 3px; }
+  .header-main .logo-mark { width: 70px; height: 36px; }
+  .header-main .logo-sub { font-size: 9px; letter-spacing: .28em; margin-right: -.28em; }
   .topbar-inner > span:first-child { font-size: 11.5px; }
   .grid, .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .card-media { padding: 14px; }
