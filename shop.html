@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-SG">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shop all products — PAR Audio Pte Ltd</title>
+  <meta name="description" content="Shop Wharfedale, Audiolab, Quad, QED and Earthquake in Singapore. Filter by brand, range, category, price and exact dimensions in millimetres.">
+  <meta name="theme-color" content="#111214">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600;700&family=Oswald:wght@400&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="shop">
+  <a class="visually-hidden" href="#main">Skip to content</a>
+  <header id="site-header"></header>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><span id="crumbs" style="display:contents"><span>Shop</span></span></nav>
+        <h1 id="shop-title">All products</h1>
+        <p id="shop-intro">Every product we sell, with full specifications and exact measurements in millimetres.</p>
+      </div>
+    </section>
+
+    <div class="container shop">
+      <aside class="filters" id="filters" aria-label="Product filters">
+        <div class="filters-head">
+          <h2>Filter</h2>
+          <div>
+            <button type="button" class="btn btn-ghost btn-sm" id="clear-all">Clear all</button>
+            <button type="button" class="icon-btn filters-close" id="filters-close" aria-label="Close filters"><span data-icon="close"></span></button>
+          </div>
+        </div>
+        <div id="filter-body"></div>
+        <div class="filters-apply"><button type="button" class="btn btn-dark btn-block" id="filters-apply">Show results</button></div>
+      </aside>
+
+      <section aria-labelledby="shop-title">
+        <div class="results-bar">
+          <p class="results-count" id="results-count" aria-live="polite"></p>
+          <div class="results-tools">
+            <button type="button" class="btn btn-outline btn-sm filters-toggle" id="filters-toggle">Filters</button>
+            <label class="visually-hidden" for="sort">Sort by</label>
+            <select class="select" id="sort">
+              <option value="featured">Sort: Featured</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="name">Name: A–Z</option>
+              <option value="h-asc">Height: shortest first</option>
+              <option value="h-desc">Height: tallest first</option>
+              <option value="w-asc">Width: narrowest first</option>
+              <option value="weight-asc">Weight: lightest first</option>
+            </select>
+          </div>
+        </div>
+        <div class="chips" id="chips"></div>
+        <div class="grid grid-3" id="results"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/render.js"></script>
+  <script src="assets/js/photos.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/pages/shop.js"></script>
+</body>
+</html>

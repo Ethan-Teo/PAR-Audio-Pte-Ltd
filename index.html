@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en-SG">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PAR Audio Pte Ltd — Wharfedale, Audiolab, Quad, QED &amp; Earthquake, Singapore</title>
+  <meta name="description" content="PAR Audio Pte Ltd is Singapore's specialist for Wharfedale, Audiolab, Quad, QED and Earthquake. Every model, with full specifications and exact dimensions in millimetres.">
+  <meta name="theme-color" content="#111214">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600;700&family=Oswald:wght@400&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="home">
+  <a class="visually-hidden" href="#main">Skip to content</a>
+  <header id="site-header"></header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div>
+          <p class="eyebrow">Wharfedale · Audiolab · Quad · QED · Earthquake</p>
+          <h1>British hi-fi,<br><em>measured to the millimetre.</em></h1>
+          <p class="lead">PAR Audio is Singapore's specialist for Wharfedale, Audiolab, Quad, QED and Earthquake. Every model, with exact measurements in millimetres and drawn to scale, so you know it fits before it arrives.</p>
+          <div class="hero-cta">
+            <a class="btn btn-light btn-lg" href="shop.html?brand=Wharfedale">Shop Wharfedale</a>
+            <a class="btn btn-outline-light btn-lg" href="shop.html?brand=Audiolab">Shop Audiolab</a>
+          </div>
+          <div class="hero-stats">
+            <div><strong id="stat-models">—</strong><span>Models available</span></div>
+            <div><strong id="stat-ranges">—</strong><span>Product ranges</span></div>
+            <div><strong>100%</strong><span>Specified in mm</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div id="hero-lineup"></div>
+          <p class="hero-caption">Shown to scale · heights in <span class="mono">mm</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust strip -->
+    <section class="trust" aria-label="Why buy from PAR Audio">
+      <div class="container trust-inner" id="trust"></div>
+    </section>
+
+    <!-- Brands -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Two British icons</p>
+            <h2 class="display">Five brands, complete ranges</h2>
+          </div>
+          <a class="link-arrow" href="brands.html">Find all brands <span data-icon="arrow"></span></a>
+        </div>
+        <div class="brand-grid" id="brand-grid"></div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="section-tight" style="padding-top:0">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Shop by category</p>
+            <h2 class="display">Find the right component</h2>
+          </div>
+        </div>
+        <div class="cat-grid" id="cat-grid"></div>
+      </div>
+    </section>
+
+    <!-- Featured -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">New &amp; noteworthy</p>
+            <h2 class="display">Featured this season</h2>
+            <p class="lead">From the new Elysian R flagships to the award-winning Audiolab 6000A MKII.</p>
+          </div>
+          <a class="link-arrow" href="shop.html">View all <span data-icon="arrow"></span></a>
+        </div>
+        <div class="grid" id="featured-grid"></div>
+      </div>
+    </section>
+
+    <!-- Will it fit? -->
+    <section class="section band-dark" id="fit">
+      <div class="container fit">
+        <div>
+          <p class="eyebrow">Will it fit?</p>
+          <h2>Enter your space. We'll show what fits.</h2>
+          <p>Every speaker and component we sell is listed with its height, width and depth in millimetres. Tell us the space you have, whether it's a shelf, a TV cabinet or a hi-fi rack, and we'll list every model that fits inside it.</p>
+        </div>
+        <form class="fit-form" id="fit-form" action="shop.html">
+          <div class="fit-fields">
+            <div><label for="fit-h">Max height</label><div class="input-unit"><input id="fit-h" name="maxh" type="number" inputmode="numeric" min="1" max="3000" placeholder="e.g. 400"></div></div>
+            <div><label for="fit-w">Max width</label><div class="input-unit"><input id="fit-w" name="maxw" type="number" inputmode="numeric" min="1" max="3000" placeholder="e.g. 500"></div></div>
+            <div><label for="fit-d">Max depth</label><div class="input-unit"><input id="fit-d" name="maxd" type="number" inputmode="numeric" min="1" max="3000" placeholder="e.g. 350"></div></div>
+          </div>
+          <div class="fit-row">
+            <div><label for="fit-cat">Looking for</label>
+              <select id="fit-cat" name="cat"></select>
+            </div>
+            <button class="btn btn-primary btn-lg" type="submit">Show products</button>
+          </div>
+          <p class="fit-note" id="fit-note" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Series -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Every range, every model</p>
+            <h2 class="display">Explore by series</h2>
+          </div>
+        </div>
+        <div class="series-list" id="series-list"></div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section" style="padding-top:0">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">The PAR Audio service</p>
+            <h2 class="display">Expert advice, from audition to installation</h2>
+          </div>
+          <a class="link-arrow" href="contact.html">Visit &amp; contact <span data-icon="arrow"></span></a>
+        </div>
+        <div class="services" id="services"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/render.js"></script>
+  <script src="assets/js/photos.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/pages/home.js"></script>
+</body>
+</html>
