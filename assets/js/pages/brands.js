@@ -23,7 +23,10 @@
     const series = Object.keys(info.series);
     // Lineup of each range's lead model, drawn to the same scale
     const leads = series.map((s) => PRODUCTS.find((p) => p.brand === b && p.series === s)).filter(Boolean).slice(0, 5);
-    const visual = R.lineup(leads.map((p) => ({ parts: [{ p }] })), { names: false, heights: false, cls: 'bp-svg', gap: 60 });
+    const boxed = leads.filter((p) => p.dims);
+    const visual = boxed.length
+      ? R.lineup(boxed.map((p) => ({ parts: [{ p }] })), { names: false, heights: false, cls: 'bp-svg', gap: 60 })
+      : media(leads[0], null, { cls: 'bp-svg', reflect: false, pad: 0.04 });
     return `<section class="brand-block" id="brand-${slug(b)}" aria-labelledby="bh-${slug(b)}">
       <div class="brand-hero">
         <div>

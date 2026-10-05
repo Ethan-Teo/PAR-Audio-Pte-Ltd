@@ -39,6 +39,7 @@
       if (S.pmin != null && p.price < S.pmin) return false;
       if (S.pmax != null && p.price > S.pmax) return false;
     }
+    if ((S.maxh != null || S.maxw != null || S.maxd != null) && !p.dims) return false;
     if (S.maxh != null && p.dims.h > S.maxh) return false;
     if (S.maxw != null && p.dims.w > S.maxw) return false;
     if (S.maxd != null && p.dims.d > S.maxd) return false;
@@ -50,9 +51,9 @@
     'price-asc': (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity),
     'price-desc': (a, b) => (b.price ?? -1) - (a.price ?? -1),
     name: (a, b) => `${a.brand} ${a.name}`.localeCompare(`${b.brand} ${b.name}`, 'en', { numeric: true }),
-    'h-asc': (a, b) => a.dims.h - b.dims.h,
-    'h-desc': (a, b) => b.dims.h - a.dims.h,
-    'w-asc': (a, b) => a.dims.w - b.dims.w,
+    'h-asc': (a, b) => (a.dims ? a.dims.h : Infinity) - (b.dims ? b.dims.h : Infinity),
+    'h-desc': (a, b) => (b.dims ? b.dims.h : -1) - (a.dims ? a.dims.h : -1),
+    'w-asc': (a, b) => (a.dims ? a.dims.w : Infinity) - (b.dims ? b.dims.w : Infinity),
     'weight-asc': (a, b) => (a.weight ?? Infinity) - (b.weight ?? Infinity),
   };
 
@@ -62,7 +63,7 @@
   const opt = (facet, value, label) => `<label class="filter-option"><input type="checkbox" data-facet="${facet}" value="${esc(value)}"> <span>${esc(label)}</span><span class="n" data-count="${facet}:${esc(value)}"></span></label>`;
   const seriesOpts = Object.entries(BRANDS).map(([b, info]) =>
     `<p class="filter-sub">${b}</p>` + Object.keys(info.series).map((s) => opt('series', s, s)).join('')).join('');
-  const catOpts = ['Speakers', 'Electronics'].map((g) =>
+  const catOpts = window.CATEGORY_GROUPS.map((g) =>
     `<p class="filter-sub">${g}</p>` + CATEGORIES.filter((c) => c.group === g).map((c) => opt('cat', c.id, c.name)).join('')).join('');
 
   $('#filter-body').innerHTML = `
@@ -70,7 +71,7 @@
       <h3><label for="f-q">Search</label></h3>
       <div class="filter-dims" style="grid-template-columns:1fr"><input id="f-q" type="search" placeholder="Model, range or type" value="${esc(S.q)}" style="font-family:var(--f-body)"></div>
     </div>
-    <div class="filter-group"><h3>Brand</h3>${opt('brand', 'Wharfedale', 'Wharfedale')}${opt('brand', 'Audiolab', 'Audiolab')}</div>
+    <div class="filter-group"><h3>Brand</h3>${Object.keys(BRANDS).map((b) => opt('brand', b, b)).join('')}</div>
     <div class="filter-group"><h3>Category</h3>${catOpts}</div>
     <div class="filter-group"><h3>Range</h3>${seriesOpts}</div>
     <div class="filter-group"><h3>Price (S$)</h3>
@@ -134,7 +135,7 @@
 
     // heading
     let title = 'All products';
-    let intro = 'Every Wharfedale loudspeaker and Audiolab component, with full specifications and exact dimensions in millimetres.';
+    let intro = `Every product from ${Object.keys(BRANDS).join(', ').replace(/, ([^,]*)$/, ' and $1')}, with full specifications and exact measurements in millimetres.`;
     const one = (set) => (set.size === 1 ? [...set][0] : null);
     const b = one(S.brand), s = one(S.series), c = one(S.cat);
     if (s) {
@@ -143,7 +144,7 @@
     } else if (b && c) { title = `${b} ${catById(c).name}`; }
     else if (b) { title = b; intro = BRANDS[b].blurb; }
     else if (c) { title = catById(c).name; }
-    else if (S.q) { title = `Search: “${S.q}”`; intro = 'Results from the complete Wharfedale and Audiolab catalogue.'; }
+    else if (S.q) { title = `Search: “${S.q}”`; intro = 'Results from our complete catalogue.'; }
     else if (S.maxh || S.maxw || S.maxd) { title = 'Products that fit your space'; intro = 'Every product below fits within the maximum dimensions you entered.'; }
     $('#shop-title').textContent = title;
     $('#shop-intro').textContent = intro;

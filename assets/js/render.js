@@ -233,6 +233,27 @@
       return out;
     }
     const fh = face === 'puck' ? 0 : clamp(H * 0.08, 2, 7);
+    if (face === 'valve') {
+      const ch = H * 0.42;
+      const cy = H - fh - ch;
+      // transformers (rear) and valves, standing on the chassis
+      out.push({ s: 'rect', x: W * 0.05, y: cy - H * 0.36, w: W * 0.2, h: H * 0.36, rx: 3, role: 'xfmr' });
+      out.push({ s: 'rect', x: W * 0.75, y: cy - H * 0.36, w: W * 0.2, h: H * 0.36, rx: 3, role: 'xfmr' });
+      [[0.32, 0.5, 0.075], [0.43, 0.5, 0.075], [0.57, 0.5, 0.075], [0.68, 0.5, 0.075]].forEach(([fx, fhh, fw]) => {
+        const tw = W * fw, th = H * fhh;
+        out.push({ s: 'rect', x: W * fx - tw / 2, y: cy - th, w: tw, h: th, rx: tw / 2, role: 'tube' });
+        out.push({ s: 'rect', x: W * fx - tw * 0.18, y: cy - th * 0.55, w: tw * 0.36, h: th * 0.32, rx: 2, role: 'tube-glow' });
+      });
+      out.push({ s: 'rect', x: 0, y: cy, w: W, h: ch, rx: 4, role: 'body' });
+      knob(out, W * 0.14, cy + ch * 0.52, ch * 0.5);
+      knob(out, W * 0.86, cy + ch * 0.52, ch * 0.5);
+      out.push({ s: 'circle', cx: W * 0.32, cy: cy + ch * 0.52, r: ch * 0.07, role: 'button' });
+      out.push({ s: 'circle', cx: W * 0.68, cy: cy + ch * 0.52, r: ch * 0.07, role: 'button' });
+      out.push({ s: 'text', x: W * 0.5, y: cy + ch * 0.6, text: p.brand.toUpperCase(), size: ch * 0.18, anchor: 'middle', role: 'brand' });
+      out.push({ s: 'rect', x: W * 0.06, y: H - fh, w: W * 0.07, h: fh, rx: 1, role: 'foot' });
+      out.push({ s: 'rect', x: W * 0.87, y: H - fh, w: W * 0.07, h: fh, rx: 1, role: 'foot' });
+      return out;
+    }
     const bh = H - fh;
     out.push({ s: 'rect', x: 0, y: 0, w: W, h: bh, rx: Math.min(bh * 0.08, 5), role: 'body' });
     out.push({ s: 'line', x1: 3, y1: 1.2, x2: W - 3, y2: 1.2, role: 'edge' });
@@ -241,7 +262,8 @@
       out.push({ s: 'rect', x: W * 0.06, y: bh, w: fw, h: fh, rx: 1, role: 'foot' });
       out.push({ s: 'rect', x: W - W * 0.06 - fw, y: bh, w: fw, h: fh, rx: 1, role: 'foot' });
     }
-    const brand = (x, y, size, anchor) => out.push({ s: 'text', x, y, text: 'audiolab', size, anchor: anchor || 'middle', role: 'brand' });
+    const mark = p.brand === 'Audiolab' ? 'audiolab' : p.brand.toUpperCase();
+    const brand = (x, y, size, anchor) => out.push({ s: 'text', x, y, text: mark, size: Math.min(size, W * 0.075), anchor: anchor || 'middle', role: 'brand' });
     const btn = (cx, cy, r) => out.push({ s: 'circle', cx, cy, r, role: 'button' });
 
     if (face === 'amp') {
@@ -294,11 +316,81 @@
     return out;
   }
 
+  /** Quad ESL: metal frame, full-height grille over stacked electrostatic panels. */
+  function layoutESL(p) {
+    const { h: H, w: W } = p.dims;
+    const out = [];
+    const foot = clamp(H * 0.03, 18, 40);
+    const fh = H - foot;
+    out.push({ s: 'rect', x: 0, y: 0, w: W, h: fh, rx: 6, role: 'metal' });
+    const i = W * 0.055;
+    const g = { s: 'rect', x: i, y: i, w: W - i * 2, h: fh - i * 2.6, rx: 3, role: 'grille' };
+    out.push(g);
+    const n = p.render.panels || 4;
+    for (let k = 1; k < n; k++) {
+      const y = g.y + (g.h * k) / n;
+      out.push({ s: 'line', x1: g.x + 4, y1: y, x2: g.x + g.w - 4, y2: y, role: 'esl-seam' });
+    }
+    out.push({ s: 'line', x1: W / 2, y1: g.y + 4, x2: W / 2, y2: g.y + g.h - 4, role: 'esl-seam' });
+    const bw = clamp(W * 0.12, 30, 80);
+    out.push({ s: 'rect', x: W / 2 - bw / 2, y: fh - i * 1.1, w: bw, h: clamp(H * 0.006, 4, 9), rx: 3, role: 'badge' });
+    out.push({ s: 'rect', x: W * 0.08, y: fh, w: W * 0.16, h: foot, rx: 3, role: 'foot' });
+    out.push({ s: 'rect', x: W * 0.76, y: fh, w: W * 0.16, h: foot, rx: 3, role: 'foot' });
+    return out;
+  }
+
+  /** Tactile transducer: finned cylindrical body on a mounting flange (side elevation). */
+  function layoutTransducer(p) {
+    const { h: H, w: W } = p.dims;
+    const out = [];
+    const fl = H * 0.14;
+    out.push({ s: 'rect', x: 0, y: H - fl, w: W, h: fl, rx: 3, role: 'metal' });
+    const bw = W * 0.78;
+    out.push({ s: 'rect', x: (W - bw) / 2, y: 0, w: bw, h: H - fl, rx: 8, role: 'metal' });
+    for (let k = 1; k < 9; k++) {
+      const x = (W - bw) / 2 + (bw * k) / 9;
+      out.push({ s: 'line', x1: x, y1: H * 0.12, x2: x, y2: H - fl - H * 0.06, role: 'fin' });
+    }
+    out.push({ s: 'rect', x: W / 2 - 12, y: H * 0.04, w: 24, h: 4, rx: 2, role: 'badge' });
+    return out;
+  }
+
+  /** Cable: a loose coil with its two terminated ends (illustrative, not to scale). */
+  const CABLE_BOX = { w: 320, h: 240 };
+  function layoutCable(p) {
+    const out = [];
+    const col = p.render.color || '#222';
+    const light = parseInt(col.slice(1, 3), 16) > 150;
+    for (let k = 0; k < 5; k++) {
+      out.push({ s: 'ellipse', cx: 160 + k * 5 - 10, cy: 104 + k * 3, rx: 112 - k * 7, ry: 62 - k * 4, role: 'cable-loop', color: col, light });
+    }
+    out.push({ s: 'path', d: 'M70 140 C55 175 40 190 52 212', role: 'cable-lead', color: col, light });
+    out.push({ s: 'path', d: 'M246 146 C268 180 284 192 270 214', role: 'cable-lead', color: col, light });
+    const plug = (x, y, ends, hue) => {
+      if (ends === 'banana') {
+        out.push({ s: 'rect', x: x - 7, y, w: 14, h: 18, rx: 3, role: hue });
+        out.push({ s: 'rect', x: x - 3, y: y + 18, w: 6, h: 14, rx: 2, role: 'plug-gold' });
+      } else if (ends === 'rca') {
+        out.push({ s: 'rect', x: x - 8, y, w: 16, h: 20, rx: 3, role: 'plug-black' });
+        out.push({ s: 'rect', x: x - 6, y: y + 4, w: 12, h: 4, rx: 1, role: hue });
+        out.push({ s: 'rect', x: x - 6, y: y + 20, w: 12, h: 10, rx: 2, role: 'plug-gold' });
+      } else {
+        out.push({ s: 'rect', x: x - 4, y, w: 8, h: 10, rx: 2, role: 'copper' });
+      }
+    };
+    plug(52, 210, p.render.ends, 'plug-red');
+    plug(270, 212, p.render.ends, 'plug-black2');
+    return out;
+  }
+
   function layout(p, mode) {
     switch (p.render.kind) {
       case 'speaker': return layoutSpeaker(p);
       case 'sub': return layoutSub(p);
       case 'stand': return layoutStand(p);
+      case 'esl': return layoutESL(p);
+      case 'transducer': return layoutTransducer(p);
+      case 'cable': return layoutCable(p);
       default: return layoutComponent(p, mode);
     }
   }
@@ -310,6 +402,8 @@
     if (sh.s === 'rect') return `<rect x="${r1(sh.x)}" y="${r1(sh.y)}" width="${r1(sh.w)}" height="${r1(sh.h)}" rx="${r1(sh.rx || 0)}" ${attrs}/>`;
     if (sh.s === 'circle') return `<circle cx="${r1(sh.cx)}" cy="${r1(sh.cy)}" r="${r1(sh.r)}" ${attrs}/>`;
     if (sh.s === 'line') return `<line x1="${r1(sh.x1)}" y1="${r1(sh.y1)}" x2="${r1(sh.x2)}" y2="${r1(sh.y2)}" ${attrs}/>`;
+    if (sh.s === 'ellipse') return `<ellipse cx="${r1(sh.cx)}" cy="${r1(sh.cy)}" rx="${r1(sh.rx)}" ry="${r1(sh.ry)}" ${attrs}/>`;
+    if (sh.s === 'path') return `<path d="${sh.d}" ${attrs}/>`;
     if (sh.s === 'poly') return `<polygon points="${sh.pts.map((q) => r1(q[0]) + ',' + r1(q[1])).join(' ')}" ${attrs}/>`;
     if (sh.s === 'text') return `<text x="${r1(sh.x)}" y="${r1(sh.y)}" font-size="${r1(sh.size)}" text-anchor="${sh.anchor}" ${attrs}>${esc(sh.text)}</text>`;
     return '';
@@ -390,6 +484,20 @@
         case 'foot': s += geom(sh, `fill="${f.metal ? '#55585c' : '#0d0d0e'}"`); break;
         case 'metal': s += geom(sh, 'fill="#1f1f22"') + geom(sh, 'fill="none" stroke="#fff" stroke-opacity=".08"'); break;
         case 'body': s += geom(sh, `fill="url(#${id}body)" stroke="#000" stroke-opacity="${f.metal ? 0.18 : 0.5}" stroke-width=".6"`) + geom(sh, `fill="url(#${id}brush)"`); break;
+        case 'esl-seam': s += geom(sh, 'stroke="#000" stroke-opacity=".35" stroke-width="1.2"'); break;
+        case 'fin': s += geom(sh, 'stroke="#000" stroke-opacity=".45" stroke-width="2.2"'); break;
+        case 'tube': s += geom(sh, 'fill="#d9e3e8" fill-opacity=".35" stroke="#8b979c" stroke-width="1.2"'); break;
+        case 'tube-glow': s += geom(sh, 'fill="#ff9c40" fill-opacity=".85"'); break;
+        case 'xfmr': s += geom(sh, 'fill="#1c1c1f" stroke="#000" stroke-opacity=".5"'); break;
+        case 'cable-loop': case 'cable-lead':
+          s += geom(sh, `fill="none" stroke="${sh.light ? '#9b968a' : '#000'}" stroke-width="13" stroke-linecap="round"`);
+          s += geom(sh, `fill="none" stroke="${sh.color}" stroke-width="10" stroke-linecap="round"`);
+          s += geom(sh, `fill="none" stroke="#fff" stroke-opacity="${sh.light ? 0.45 : 0.12}" stroke-width="2" stroke-linecap="round"`);
+          break;
+        case 'plug-gold': s += geom(sh, 'fill="#d6b46a" stroke="#8c6d2c" stroke-width=".8"'); break;
+        case 'plug-red': s += geom(sh, 'fill="#b3262b"'); break;
+        case 'plug-black': case 'plug-black2': s += geom(sh, 'fill="#1b1b1d"'); break;
+        case 'copper': s += geom(sh, 'fill="#c87a3d"'); break;
         case 'ridge': s += geom(sh, 'fill="none" stroke="#fff" stroke-opacity=".06" stroke-width=".8"'); break;
         case 'spec': s += geom(sh, 'fill="#fff" fill-opacity=".16"'); break;
         case 'knurl': s += geom(sh, `fill="none" stroke="${f.metal ? '#7d8186' : '#000'}" stroke-opacity=".7" stroke-width="${r1(Math.max(sh.r * 0.12, 0.6))}" stroke-dasharray="${r1(Math.max(sh.r * 0.05, 0.4))} ${r1(Math.max(sh.r * 0.05, 0.4))}"`); break;
@@ -426,7 +534,7 @@
     return s;
   }
 
-  const LINE_SKIP = new Set(['pleat', 'display-text', 'display-dim', 'brand', 'screw', 'cone', 'edge', 'led', 'knob-mark', 'tw-ring', 'ridge', 'spec', 'knurl', 'disp-txt', 'disp-val']);
+  const LINE_SKIP = new Set(['pleat', 'display-text', 'display-dim', 'brand', 'screw', 'cone', 'edge', 'led', 'knob-mark', 'tw-ring', 'ridge', 'spec', 'knurl', 'disp-txt', 'disp-val', 'esl-seam', 'fin', 'tube-glow']);
   function paintLine(shapes) {
     let s = '';
     shapes.forEach((sh) => {
@@ -472,6 +580,7 @@
 
   /** Returns { shapes, w, h } in mm for the requested view. */
   function viewShapes(p, view) {
+    if (p.render.kind === 'cable') return { shapes: layoutCable(p), w: CABLE_BOX.w, h: CABLE_BOX.h };
     const { h: H, w: W, d: D } = p.dims;
     const puckTop = p.render.face === 'puck';
     if (view === 'grille' && p.render.kind === 'speaker') {
@@ -492,6 +601,8 @@
         out.push({ s: 'rect', x: 0, y: 0, w: Math.max(D * 0.025, 4), h: cab.h, rx: 1, role: p.render.baffle === 'black' ? 'baffle' : 'cab' });
         if (plinth) out.push({ s: 'rect', x: 0, y: plinth.y, w: D, h: plinth.h, rx: 2, role: 'plinth' });
         front.filter((sh) => sh.role === 'foot').forEach((ft) => out.push(Object.assign({}, ft, { x: ft.x / W * D, w: ft.w / W * D })));
+      } else if (p.render.kind === 'esl' || p.render.kind === 'transducer') {
+        layout(p, 'front').filter((sh) => sh.role === 'metal' || sh.role === 'foot').forEach((sh) => out.push(Object.assign({}, sh, { x: sh.x / W * D, w: sh.w / W * D })));
       } else if (p.render.kind === 'stand') {
         layout(p, 'front').forEach((sh) => out.push(Object.assign({}, sh, { x: sh.x / W * D, w: sh.w / W * D })));
       } else {
@@ -562,7 +673,7 @@
     }
     const cx = view === 'angle' ? W * 0.47 : W / 2;
     const shadow = `<ellipse cx="${r1(cx)}" cy="${r1(H)}" rx="${r1(W * 0.62)}" ry="${r1(shadowH)}" fill="url(#${sid})"/>`;
-    const label = esc(`${p.brand} ${p.name}, ${VIEW_LABELS[view] || 'view'}, drawn to scale from ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm`);
+    const label = esc(p.dims ? `${p.brand} ${p.name}, ${VIEW_LABELS[view] || 'view'}, drawn to scale from ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm` : `${p.brand} ${p.name}, illustration`);
     return `<svg class="${opts.cls || 'prod-svg'}" viewBox="${vb}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${reflection}${shadow}<g>${inner}</g></svg>`;
   }
 
@@ -577,7 +688,27 @@
   /* ------------------------------------------------------------------ */
   /* Public: dimension drawing (front + side, mm)                        */
   /* ------------------------------------------------------------------ */
+  /** Cable cross-section with its outside dimensions in mm (when published). */
+  function sectionDrawing(p) {
+    const { w: W, h: H } = p.section;
+    const U = W / 40;
+    const fs = U * 2.6, off = U * 5, a = U * 1;
+    const r = H / 2;
+    let g = `<rect x="0" y="0" width="${W}" height="${H}" rx="${r1(r)}" fill="none" stroke="currentColor" stroke-width="1.3" vector-effect="non-scaling-stroke"/>`;
+    g += `<circle cx="${r1(r)}" cy="${r1(r)}" r="${r1(r * 0.62)}" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+    g += `<circle cx="${r1(W - r)}" cy="${r1(r)}" r="${r1(r * 0.62)}" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+    const L = 'class="dim-line" vector-effect="non-scaling-stroke"';
+    g += `<line x1="0" y1="${r1(H + off)}" x2="${W}" y2="${r1(H + off)}" ${L}/><path d="M0 ${r1(H + off)} l${r1(a * 1.6)} ${r1(-a / 2)} v${r1(a)} Z M${W} ${r1(H + off)} l${r1(-a * 1.6)} ${r1(-a / 2)} v${r1(a)} Z" class="dim-arrow"/>`;
+    g += `<text x="${r1(W / 2)}" y="${r1(H + off + fs * 1.35)}" font-size="${r1(fs)}" class="dim-text" text-anchor="middle">W ${W} mm</text>`;
+    g += `<line x1="${r1(-off)}" y1="0" x2="${r1(-off)}" y2="${H}" ${L}/><path d="M${r1(-off)} 0 l${r1(-a / 2)} ${r1(a * 1.6)} h${r1(a)} Z M${r1(-off)} ${H} l${r1(-a / 2)} ${r1(-a * 1.6)} h${r1(a)} Z" class="dim-arrow"/>`;
+    g += `<text x="${r1(-off - fs * 0.5)}" y="${r1(H / 2 + fs * 0.35)}" font-size="${r1(fs)}" class="dim-text" text-anchor="end">H ${H} mm</text>`;
+    g += `<text x="${r1(W / 2)}" y="${r1(-U * 3)}" font-size="${r1(fs * 0.72)}" class="view-label" text-anchor="middle">CROSS-SECTION</text>`;
+    const minX = -off - fs * 5.2, minY = -U * 7, maxX = W + U * 3, maxY = H + off + fs * 2.2;
+    return `<svg class="dim-svg" viewBox="${[minX, minY, maxX - minX, maxY - minY].map(r1).join(' ')}" role="img" aria-label="${esc(`Cross-section of ${p.brand} ${p.name}: ${W} by ${H} mm`)}" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+  }
+
   function drawing(p) {
+    if (!p.dims) return p.section ? sectionDrawing(p) : '';
     const { h: H, w: W, d: D } = p.dims;
     const U = Math.max(H, W + D) / 100;
     const G = Math.min(W, D) * 0.15 + U * 14;
@@ -645,6 +776,8 @@
   /* ------------------------------------------------------------------ */
   function lineup(items, opts) {
     opts = opts || {};
+    items = items.filter((it) => it.parts.every((pt) => pt.p.dims));
+    if (!items.length) return '';
     const meas = items.map((it) => {
       const w = Math.max(...it.parts.map((pt) => pt.p.dims.w));
       const h = it.parts.reduce((s, pt) => s + pt.p.dims.h, 0);

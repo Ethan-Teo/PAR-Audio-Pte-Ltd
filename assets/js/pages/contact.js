@@ -22,7 +22,7 @@
 
   // Product picker
   const sel = $('#c-product');
-  sel.innerHTML = '<option value="">—</option>' + ['Wharfedale', 'Audiolab'].map((b) =>
+  sel.innerHTML = '<option value="">—</option>' + Object.keys(window.BRANDS).map((b) =>
     `<optgroup label="${b}">${window.PRODUCTS.filter((p) => p.brand === b).map((p) => `<option value="${p.id}">${esc(p.series)} · ${esc(p.name)}</option>`).join('')}</optgroup>`).join('');
 
   // Prefill from ?product= and ?topic=

@@ -29,7 +29,7 @@
   function renderEmpty() {
     const picks = ['linton', 'evo-5-1', 'audiolab-6000a-mkii', 'diamond-12-1i'].map(byId);
     root.innerHTML = `
-      <div class="empty" style="margin:40px 0 0"><h3>Your cart is empty</h3><p>Explore the complete Wharfedale and Audiolab ranges, every model specified in millimetres.</p>
+      <div class="empty" style="margin:40px 0 0"><h3>Your cart is empty</h3><p>Explore our complete ranges, every product specified in millimetres.</p>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="btn btn-dark" href="shop.html?brand=Wharfedale">Shop Wharfedale</a><a class="btn btn-outline" href="shop.html?brand=Audiolab">Shop Audiolab</a></div></div>
       <section class="section" style="padding-top:64px"><div class="section-head"><div><p class="eyebrow">Popular picks</p><h2 class="display">Customers also choose</h2></div></div>
         <div class="grid">${picks.map(card).join('')}</div></section>`;
@@ -143,7 +143,7 @@
         <div>
           <p class="eyebrow" style="font-size:11px;color:var(--muted)">${esc(p.brand)} · ${esc(p.series)}</p>
           <h3><a href="${productUrl(p)}">${esc(p.name)}</a></h3>
-          <p class="cart-meta">${esc(opts)}<br><span class="mono">${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm</span> · ${money(unit)} ${unitLabel(p)}</p>
+          <p class="cart-meta">${esc(opts)}<br><span class="mono">${esc(PAR.dimsText(p))}</span> · ${money(unit)} ${unitLabel(p)}${p.unit === 'metre' ? ' · quantity = metres' : ''}</p>
           <div class="cart-actions">
             <div class="qty qty-sm" role="group" aria-label="Quantity for ${esc(p.name)}">
               <button type="button" data-step="-1" data-i="${idx}" aria-label="Decrease">−</button>

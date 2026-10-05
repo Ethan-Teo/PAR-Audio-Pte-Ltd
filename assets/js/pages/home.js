@@ -58,7 +58,19 @@
     { parts: [{ p: byId('audiolab-omnia'), finish: 'silver' }] },
     { parts: [{ p: byId('audiolab-d9'), finish: 'silver' }] },
   ], { names: false, heights: false, gap: 40, cls: 'bp-svg' });
-  $('#brand-grid').innerHTML = brandPanel('Wharfedale', 'wharfedale', wVisual) + brandPanel('Audiolab', 'audiolab', aVisual);
+  const qVisual = R.lineup([
+    { parts: [{ p: byId('quad-esl-2912x') }] },
+    { parts: [{ p: byId('quad-revela-2'), finish: 'walnut' }] },
+    { parts: [{ p: byId('quad-artera-solus-play'), finish: 'silver' }] },
+  ], { names: false, heights: false, gap: 70, cls: 'bp-svg' });
+  const eVisual = R.lineup([
+    { parts: [{ p: byId('eq-supernova-mkvi-15') }] },
+    { parts: [{ p: byId('eq-minime-p12') }] },
+    { parts: [{ p: byId('eq-minime-p8') }] },
+  ], { names: false, heights: false, gap: 50, cls: 'bp-svg' });
+  const cVisual = R.thumb(byId('qed-performance-speaker'), null, { cls: 'bp-svg', reflect: false, pad: 0.04 });
+  $('#brand-grid').innerHTML = brandPanel('Wharfedale', 'wharfedale', wVisual) + brandPanel('Audiolab', 'audiolab', aVisual) +
+    `<div class="brand-grid-3">${brandPanel('Quad', 'quad small', qVisual)}${brandPanel('QED', 'qed small', cVisual)}${brandPanel('Earthquake', 'earthquake small', eVisual)}</div>`;
 
   /* Category tiles */
   const rep = {
@@ -66,6 +78,7 @@
     subwoofer: ['sw-12'], active: ['diamond-active-a1', 'white'], stand: ['linton-stands'],
     integrated: ['audiolab-9000a', 'silver'], prepower: ['audiolab-9000p', 'black'], streamer: ['audiolab-7000n-play', 'silver'],
     cd: ['audiolab-6000cdt', 'black'], allinone: ['audiolab-omnia', 'silver'], dac: ['audiolab-d7', 'silver'],
+    tactile: ['eq-q10b'], 'speaker-cable': ['qed-performance-speaker'], interconnect: ['qed-performance-audio'],
   };
   $('#cat-grid').innerHTML = window.CATEGORIES.map((c) => {
     const [id, fin] = rep[c.id];
@@ -83,14 +96,14 @@
   /* Fit tool */
   const sel = $('#fit-cat');
   sel.innerHTML = '<option value="">Any product</option>' +
-    ['Speakers', 'Electronics'].map((g) => `<optgroup label="${g}">${window.CATEGORIES.filter((c) => c.group === g).map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</optgroup>`).join('');
+    window.CATEGORY_GROUPS.filter((g) => g !== 'Cables').map((g) => `<optgroup label="${g}">${window.CATEGORIES.filter((c) => c.group === g).map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</optgroup>`).join('');
   const form = $('#fit-form');
   const note = $('#fit-note');
   const updateFit = () => {
     const v = (n) => { const x = parseFloat(form.elements[n].value); return x > 0 ? x : Infinity; };
     const mh = v('maxh'), mw = v('maxw'), md = v('maxd');
     const cat = sel.value;
-    const list = PRODUCTS.filter((p) => (!cat || p.category === cat) && p.dims.h <= mh && p.dims.w <= mw && p.dims.d <= md);
+    const list = PRODUCTS.filter((p) => p.dims && (!cat || p.category === cat) && p.dims.h <= mh && p.dims.w <= mw && p.dims.d <= md);
     const any = [mh, mw, md].some((x) => x !== Infinity);
     note.innerHTML = any
       ? `<span class="mono">${list.length}</span> product${list.length === 1 ? '' : 's'} fit within <span class="mono">${[mh, mw, md].map((x) => (x === Infinity ? '∞' : x)).join(' × ')} mm</span> (H × W × D).`
@@ -117,7 +130,7 @@
 
   /* Services */
   $('#services').innerHTML = [
-    ['ear', 'Listening sessions', 'Hear Wharfedale and Audiolab systems side by side in a quiet, treated room. Bring your own music. Sessions are by appointment so you have our full attention.', 'contact.html#listening', 'Book a session'],
+    ['ear', 'Listening sessions', 'Hear our speakers and electronics side by side in a quiet, treated room. Bring your own music. Sessions are by appointment so you have our full attention.', 'contact.html#listening', 'Book a session'],
     ['truck', 'Delivery & installation', `Free delivery across Singapore on orders over S$${SITE.freeDeliveryThreshold}. Our team can unpack, position and connect your system, and take the packaging away.`, 'contact.html#delivery', 'Delivery details'],
     ['ruler', 'System planning', 'Send us your room or cabinet measurements. We\'ll recommend speakers, stands and electronics that fit your space, your budget and the way you listen.', 'contact.html', 'Ask our team'],
   ].map(([icon, t, d, href, cta]) => `<div class="service">${ICONS[icon]}<h3>${t}</h3><p>${d}</p><a class="link-arrow" style="margin-top:18px" href="${href}">${cta} ${ICONS.arrow}</a></div>`).join('');

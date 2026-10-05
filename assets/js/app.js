@@ -19,8 +19,10 @@
   const catById = (id) => window.CATEGORIES.find((c) => c.id === id);
   const params = () => new URLSearchParams(location.search);
   const productUrl = (p) => `product.html?id=${encodeURIComponent(p.id)}`;
-  const unitLabel = (p) => (p.unit === 'pair' ? 'per pair' : 'each');
-  const dimsText = (p) => `${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm`;
+  const unitLabel = (p) => (p.unit === 'pair' ? 'per pair' : p.unit === 'metre' ? 'per metre' : 'each');
+  /* Boxed products have H × W × D in mm; cables are described by `measures` (conductor size, length…) */
+  const hasDims = (p) => !!p.dims;
+  const dimsText = (p) => (p.dims ? `${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm` : (p.measures || []).map((m) => m[1]).join(' · '));
   const weightText = (w) => (w == null ? '—' : w < 1 ? `${Math.round(w * 1000)} g` : `${(+w).toLocaleString('en-SG', { maximumFractionDigits: 2 })} kg`);
   const finishLabel = (f) => (R.FINISHES[f] ? R.FINISHES[f].label : f);
   const variantOf = (p, vid) => (p.variants ? p.variants.find((v) => v.id === vid) || p.variants[0] : null);
@@ -186,7 +188,7 @@
       `<a class="mega-feature mega-all" href="brands.html"><span><em>${brandNames.length} brands</em>Find all brands</span>
         <span class="mega-all-list">${brandNames.map(esc).join(' · ')}</span><span class="link-arrow">View all brands ${ICONS.arrow}</span></a>`;
     const sMenu = `<div><p class="mega-title">Loudspeakers</p><ul>${catLinks('Speakers')}</ul></div>
-      <div><p class="mega-title">Electronics</p><ul>${catLinks('Electronics')}</ul></div>
+      <div><p class="mega-title">Electronics</p><ul>${catLinks('Electronics')}</ul><p class="mega-title" style="margin-top:22px">Cables</p><ul>${catLinks('Cables')}</ul></div>
       <a class="mega-feature" href="${productUrl(byId('elysian-4r'))}">${media(byId('elysian-4r'), 'walnut', { cls: 'mega-svg', pad: 0.06, view: 'angle' })}<span><em>New</em>Elysian 4R</span></a>`;
 
     el.innerHTML = `
@@ -238,11 +240,11 @@
       <div class="container footer-grid">
         <div class="footer-brand">
           ${logo(true)}
-          <p>${esc(SITE.tagline)}. Every Wharfedale loudspeaker and Audiolab component, with complete specifications in millimetres.</p>
+          <p>${esc(SITE.tagline)}. Every product with complete specifications, measured in millimetres.</p>
           <p class="footer-contact"><a href="tel:${SITE.phone.replace(/\s/g, '')}">${esc(SITE.phone)}</a><br><a href="mailto:${SITE.email}">${esc(SITE.email)}</a></p>
         </div>
-        <div><h4>Wharfedale</h4><ul>${seriesLinks('Wharfedale')}</ul></div>
-        <div><h4>Audiolab</h4><ul>${seriesLinks('Audiolab')}</ul></div>
+        <div><h4>Brands</h4><ul>${Object.keys(window.BRANDS).map((b) => `<li><a href="shop.html?brand=${encodeURIComponent(b)}">${esc(b)}</a></li>`).join('')}<li><a href="brands.html">All brands</a></li></ul></div>
+        <div><h4>Shop</h4><ul>${window.CATEGORY_GROUPS.map((g) => `<li><a href="shop.html?group=${encodeURIComponent(g)}">${esc(g)}</a></li>`).join('')}<li><a href="shop.html">All products</a></li><li><a href="index.html#fit">Will it fit?</a></li></ul></div>
         <div><h4>Customer care</h4><ul>
           <li><a href="contact.html#delivery">Delivery &amp; installation</a></li>
           <li><a href="contact.html#warranty">Warranty &amp; returns</a></li>
@@ -258,7 +260,7 @@
       </div>
       <div class="container footer-legal">
         <p>© ${year} ${esc(SITE.name)}. All rights reserved.</p>
-        <p>Wharfedale and Audiolab are trademarks of their respective owners. Product illustrations are drawn to scale from published dimensions. Specifications and prices are subject to change without notice.</p>
+        <p>${Object.keys(window.BRANDS).join(', ').replace(/, ([^,]*)$/, ' and $1')} are trademarks of their respective owners. Product illustrations are drawn to scale from published dimensions. Specifications and prices are subject to change without notice.</p>
       </div>`;
   }
 
@@ -269,7 +271,7 @@
         <div class="search-panel container">
           <form class="search-form" action="shop.html" role="search">
             ${ICONS.search}
-            <input type="search" name="q" id="search-input" placeholder="Search Wharfedale & Audiolab — e.g. “Linton”, “streamer”, “9000”" autocomplete="off" aria-label="Search">
+            <input type="search" name="q" id="search-input" placeholder="Search all brands — e.g. “Linton”, “ESL”, “speaker cable”" autocomplete="off" aria-label="Search">
             <button type="button" class="icon-btn" data-close-search aria-label="Close search">${ICONS.close}</button>
           </form>
           <div class="search-results" id="search-results"></div>
@@ -380,9 +382,11 @@
         <p class="eyebrow">${esc(p.brand)} · ${esc(p.series)}</p>
         <h3 class="card-title"><a href="${productUrl(p)}">${esc(p.name)}</a></h3>
         <p class="card-type">${esc(p.type)}</p>
-        <dl class="card-dims" aria-label="Dimensions in millimetres">
+        ${p.dims ? `<dl class="card-dims" aria-label="Dimensions in millimetres">
           <div><dt>H</dt><dd>${p.dims.h}</dd></div><div><dt>W</dt><dd>${p.dims.w}</dd></div><div><dt>D</dt><dd>${p.dims.d}</dd></div><div class="unit">mm${p.weight != null ? ` · ${weightText(p.weight)}` : ''}</div>
-        </dl>
+        </dl>` : `<dl class="card-dims card-measures" aria-label="Measurements">
+          ${(p.measures || []).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}
+        </dl>`}
         <div class="card-foot">${priceHTML(p)}${cta}</div>
         <label class="compare-toggle"><input type="checkbox" data-compare="${p.id}"${compare.has(p.id) ? ' checked' : ''}> <span>Compare</span></label>
       </div>
@@ -422,6 +426,6 @@
 
   window.PAR = {
     $, $$, esc, money, byId, catById, params, productUrl, unitLabel, dimsText, weightText, finishLabel,
-    variantOf, priceOf, photos, media, cart, compare, search, card, priceHTML, badgeHTML, toast, init, ICONS, syncCompareUI, store,
+    variantOf, priceOf, photos, media, hasDims, cart, compare, search, card, priceHTML, badgeHTML, toast, init, ICONS, syncCompareUI, store,
   };
 })();

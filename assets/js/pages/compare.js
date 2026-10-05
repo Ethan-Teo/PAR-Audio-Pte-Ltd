@@ -16,11 +16,13 @@
     ['Floorstanders across the range', ['diamond-12-4i', 'evo-5-4', 'aura-4', 'elysian-4r']],
     ['Audiolab integrated amplifiers', ['audiolab-6000a-mkii', 'audiolab-7000a', 'audiolab-9000a', 'audiolab-omnia']],
     ['Centre speakers', ['diamond-12-ci', 'evo-5-c', 'heritage-centre', 'elysian-cr']],
+    ['Subwoofers', ['wh-d10', 'sw-12', 'eq-minime-p12', 'eq-supernova-mkvi-12']],
+    ['Quad ESL vs Revela', ['quad-revela-1', 'quad-revela-2', 'quad-esl-2812x', 'quad-esl-2912x']],
   ];
 
   function picker(ids) {
     if (ids.length >= 4) return '';
-    const opts = ['Wharfedale', 'Audiolab'].map((b) => `<optgroup label="${b}">${window.PRODUCTS.filter((p) => p.brand === b && !ids.includes(p.id)).map((p) => `<option value="${p.id}">${esc(p.series)} · ${esc(p.name)}</option>`).join('')}</optgroup>`).join('');
+    const opts = Object.keys(window.BRANDS).map((b) => `<optgroup label="${b}">${window.PRODUCTS.filter((p) => p.brand === b && !ids.includes(p.id)).map((p) => `<option value="${p.id}">${esc(p.series)} · ${esc(p.name)}</option>`).join('')}</optgroup>`).join('');
     return `<div class="cmp-add">
       <label class="visually-hidden" for="cmp-select">Add a product to compare</label>
       <select class="select" id="cmp-select"><option value="">Add a product to compare…</option>${opts}</select>
@@ -46,7 +48,7 @@
     const items = ids.map(byId);
     const n = items.length;
 
-    const lineup = R.lineup(items.map((p) => ({ parts: [{ p }], label: p.name, sub: `${p.dims.w} W × ${p.dims.d} D` })), {
+    const lineup = R.lineup(items.filter((p) => p.dims).map((p) => ({ parts: [{ p }], label: p.name, sub: `${p.dims.w} W × ${p.dims.d} D` })), {
       ruler: true, label: 'Selected products drawn to the same scale',
     });
 
@@ -56,18 +58,20 @@
     const specVal = (p, k) => { const hit = p.specs.find(([kk]) => kk === k); return hit ? esc(hit[1]) : '<span class="muted">—</span>'; };
 
     const best = (vals, fn) => { const nums = vals.filter((v) => v != null); if (nums.length < 2) return null; return fn(...nums); };
-    const minH = best(items.map((p) => p.dims.h), Math.min);
-    const minW = best(items.map((p) => p.dims.w), Math.min);
-    const minD = best(items.map((p) => p.dims.d), Math.min);
+    const dv = (p, k) => (p.dims ? p.dims[k] : null);
+    const minH = best(items.map((p) => dv(p, 'h')), Math.min);
+    const minW = best(items.map((p) => dv(p, 'w')), Math.min);
+    const minD = best(items.map((p) => dv(p, 'd')), Math.min);
+    const dash = '<span class="muted">—</span>';
     const cell = (v, isBest, mono) => `<td class="${mono ? 'mono' : ''}${isBest ? ' best' : ''}">${v}</td>`;
     const tr = (label, cells) => `<tr><th scope="row">${label}</th>${cells}</tr>`;
     const grp = (label) => `<tr class="group"><th scope="rowgroup" colspan="${n + 1}">${label}</th></tr>`;
 
     root.innerHTML = `
-      <div class="compare-scale">
+      ${lineup ? `<div class="compare-scale">
         ${lineup}
-        <p>All products shown at the same scale. Heights in millimetres; width (W) and depth (D) below each name.</p>
-      </div>
+        <p>All products shown at the same scale. Heights in millimetres; width (W) and depth (D) below each name.${items.some((p) => !p.dims) ? ' Cables are not shown in the scale view.' : ''}</p>
+      </div>` : ''}
       ${picker(ids)}
       <div class="cmp-wrap">
         <table class="cmp-table">
@@ -84,16 +88,17 @@
           </tr></thead>
           <tbody>
             ${grp('Dimensions (mm)')}
-            ${tr('Height', items.map((p) => cell(`${p.dims.h} mm`, p.dims.h === minH, true)).join(''))}
-            ${tr('Width', items.map((p) => cell(`${p.dims.w} mm`, p.dims.w === minW, true)).join(''))}
-            ${tr('Depth', items.map((p) => cell(`${p.dims.d} mm`, p.dims.d === minD, true)).join(''))}
-            ${tr('Footprint (W × D)', items.map((p) => cell(`${p.dims.w} × ${p.dims.d} mm`, false, true)).join(''))}
+            ${tr('Height', items.map((p) => cell(p.dims ? `${p.dims.h} mm` : dash, p.dims && p.dims.h === minH, true)).join(''))}
+            ${tr('Width', items.map((p) => cell(p.dims ? `${p.dims.w} mm` : dash, p.dims && p.dims.w === minW, true)).join(''))}
+            ${tr('Depth', items.map((p) => cell(p.dims ? `${p.dims.d} mm` : dash, p.dims && p.dims.d === minD, true)).join(''))}
+            ${tr('Footprint (W × D)', items.map((p) => cell(p.dims ? `${p.dims.w} × ${p.dims.d} mm` : dash, false, true)).join(''))}
+            ${items.some((p) => !p.dims) ? tr('Measurements', items.map((p) => cell(p.dims ? dash : esc(PAR.dimsText(p)), false, true)).join('')) : ''}
             ${tr('Net weight', items.map((p) => cell(p.weight == null ? '—' : weightText(p.weight), false, true)).join(''))}
             ${tr('Dimension notes', items.map((p) => cell(p.dimsNote ? `<span class="muted" style="font-size:13px">${esc(p.dimsNote)}</span>` : '<span class="muted">—</span>')).join(''))}
             ${grp('Overview')}
             ${tr('Type', items.map((p) => cell(esc(p.type))).join(''))}
             ${tr('Category', items.map((p) => cell(esc(catById(p.category).name))).join(''))}
-            ${tr('Sold as', items.map((p) => cell(p.unit === 'pair' ? 'Pair' : 'Single unit')).join(''))}
+            ${tr('Sold as', items.map((p) => cell(p.unit === 'pair' ? 'Pair' : p.unit === 'metre' ? 'Per metre' : 'Single unit')).join(''))}
             ${tr('Finishes', items.map((p) => cell(p.finishes.map(finishLabel).join(', '))).join(''))}
             ${grp('Specifications')}
             ${keys.map((k) => tr(esc(k), items.map((p) => cell(specVal(p, k))).join(''))).join('')}

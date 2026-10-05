@@ -17,18 +17,21 @@
   const PHOTO_LIST = PAR.photos(p);
   const VIEWS = [
     ...PHOTO_LIST.map((_, i) => [`photo${i}`, PHOTO_LIST.length > 1 ? `Photo ${i + 1}` : 'Photo']),
-    ['angle', 'Angle'], ['front', 'Front'],
-    ...(p.render.kind === 'speaker' ? [['grille', 'Grille on']] : []),
-    ['side', 'Side'], ['scale', 'Size guide'], ['drawing', 'Dimensions'],
+    ...(p.dims ? [
+      ['angle', 'Angle'], ['front', 'Front'],
+      ...(p.render.kind === 'speaker' ? [['grille', 'Grille on']] : []),
+      ['side', 'Side'], ['scale', 'Size guide'], ['drawing', 'Dimensions'],
+    ] : [['front', 'Illustration'], ...(p.section ? [['drawing', 'Cross-section']] : [])]),
   ];
-  const S = { finish: p.finishes[0], variant: p.variants ? p.variants[0].id : null, qty: 1, view: PHOTO_LIST.length ? 'photo0' : 'angle' };
+  const S = { finish: p.finishes[0], variant: p.variants ? p.variants[0].id : null, qty: 1, view: PHOTO_LIST.length ? 'photo0' : VIEWS[0][0] };
+  const DIMS = PAR.dimsText(p);
   const fullName = `${p.brand} ${p.name}`;
   const cat = catById(p.category);
   const gstOf = (n) => n - n / (1 + SITE.gstRate);
 
-  document.title = `${fullName} — ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm | PAR Audio Pte Ltd`;
+  document.title = `${fullName} — ${DIMS} | PAR Audio Pte Ltd`;
   const meta = document.querySelector('meta[name="description"]');
-  if (meta) meta.setAttribute('content', `${fullName} ${p.type.toLowerCase()}. ${p.summary} Dimensions (H × W × D): ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm.`);
+  if (meta) meta.setAttribute('content', `${fullName} ${p.type.toLowerCase()}. ${p.summary} ${p.dims ? 'Dimensions (H × W × D)' : 'Measurements'}: ${DIMS}.`);
 
   const waText = encodeURIComponent(`Hi PAR Audio, I'd like to enquire about the ${fullName}.`);
   const isEnquiry = p.price == null;
@@ -58,13 +61,17 @@
 
         <div class="pdp-price" id="price"></div>
 
-        <div class="keydims" aria-label="Key dimensions">
+        ${p.dims ? `<div class="keydims" aria-label="Key dimensions">
           <div><span>Height</span><strong>${p.dims.h}<small>mm</small></strong></div>
           <div><span>Width</span><strong>${p.dims.w}<small>mm</small></strong></div>
           <div><span>Depth</span><strong>${p.dims.d}<small>mm</small></strong></div>
           <div><span>Weight</span><strong>${p.weight == null ? '—' : weightText(p.weight).replace(/ (kg|g)$/, '<small>$1</small>')}</strong></div>
         </div>
-        <p class="dims-note">${p.dimsNote ? esc(p.dimsNote) + ' ' : ''}Weight is net, per ${p.unit === 'pair' ? 'speaker' : 'unit'}.</p>
+        <p class="dims-note">${p.dimsNote ? esc(p.dimsNote) + ' ' : ''}Weight is net, per ${p.unit === 'pair' ? 'speaker' : 'unit'}.</p>`
+        : `<div class="keydims keydims-measures" aria-label="Key measurements">
+          ${(p.measures || []).map(([k, v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join('')}
+        </div>
+        <p class="dims-note">${p.unit === 'metre' ? 'Sold by the metre: enter the number of metres you need as the quantity. Cut to length; termination available on request.' : 'Supplied as a ready-terminated pair.'}</p>`}
 
         ${p.variants ? `<div class="opt-group"><div class="opt-label">Package</div><div class="variants" id="variants">
           ${p.variants.map((v) => `<button type="button" class="variant" data-variant="${v.id}" aria-pressed="false"><span>${esc(v.label)}</span><b>${money(v.price)}</b></button>`).join('')}
@@ -105,7 +112,7 @@
 
     <div class="tabs">
       <div class="tab-list" role="tablist" aria-label="Product information">
-        <button type="button" role="tab" id="tab-dims" aria-controls="panel-dims" aria-selected="true">Dimensions</button>
+        <button type="button" role="tab" id="tab-dims" aria-controls="panel-dims" aria-selected="true">${p.dims ? 'Dimensions' : 'Measurements'}</button>
         <button type="button" role="tab" id="tab-specs" aria-controls="panel-specs" aria-selected="false" tabindex="-1">Specifications</button>
         <button type="button" role="tab" id="tab-delivery" aria-controls="panel-delivery" aria-selected="false" tabindex="-1">Delivery &amp; warranty</button>
       </div>
@@ -122,13 +129,24 @@
   /* ------------------------------------------------------------------ */
   /* Dimensions panel                                                    */
   /* ------------------------------------------------------------------ */
-  const footprint = (p.dims.w * p.dims.d) / 1e6;
+  const footprint = p.dims ? (p.dims.w * p.dims.d) / 1e6 : 0;
   const isSpeaker = ['standmount', 'floorstanding', 'centre', 'active', 'subwoofer'].includes(p.category);
   const tip = isSpeaker
     ? 'Planning placement? Most loudspeakers sound best with some space behind them. Allow room for cables at the back, and for rear-ported designs leave a gap to the wall. We\'re happy to advise for your room.'
     : p.category === 'stand' ? 'Check that your speaker\'s footprint suits the stand\'s top plate before ordering. Ask us if you\'re unsure.'
     : 'Planning a rack or cabinet? Allow extra depth behind the unit for plugs and cables, and some space above for ventilation, particularly for amplifiers.';
-  $('#panel-dims').innerHTML = `
+  $('#panel-dims').innerHTML = !p.dims ? `
+    <div class="dim-wrap">
+      ${p.section ? `<figure class="dim-figure">${R.drawing(p)}<figcaption>Cable cross-section drawn from published outside dimensions, in millimetres.</figcaption></figure>` : ''}
+      <div class="dim-table">
+        <h3>Measurements</h3>
+        <table class="spec-table">
+          ${(p.measures || []).concat(p.variants ? [['Lengths available', p.variants.map((v) => v.label).join(', ')]] : []).map(([k, v]) => `<tr><th>${esc(k)}</th><td class="mono">${esc(v)}</td></tr>`).join('')}
+          <tr><th>Sold as</th><td>${p.unit === 'metre' ? 'Per metre, cut to length' : p.unit === 'pair' ? 'Pair' : 'Single unit'}</td></tr>
+        </table>
+        <p class="tip">Measuring up? Measure the route the cable will take, not the straight-line distance, and add around 300 mm at each end for neat routing and future moves.</p>
+      </div>
+    </div>` : `
     <div class="dim-wrap">
       <figure class="dim-figure">
         ${R.drawing(p)}
@@ -166,10 +184,9 @@
           ${row('Range', esc(p.series))}
           ${row('Model', esc(p.name))}
           ${row('Category', esc(cat.name))}
-          ${row('Dimensions (H × W × D)', `${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm`, true)}
-          ${row('Net weight', p.weight == null ? '—' : weightText(p.weight) + (p.unit === 'pair' ? ' each' : ''), true)}
+          ${p.dims ? row('Dimensions (H × W × D)', DIMS, true) + row('Net weight', p.weight == null ? '—' : weightText(p.weight) + (p.unit === 'pair' ? ' each' : ''), true) : (p.measures || []).map(([k, v]) => row(k, esc(v), true)).join('')}
           ${row('Finishes', p.finishes.map(finishLabel).join(', '))}
-          ${row('Sold as', p.unit === 'pair' ? 'Pair' : 'Single unit')}
+          ${row('Sold as', p.unit === 'pair' ? 'Pair' : p.unit === 'metre' ? 'Per metre' : 'Single unit')}
         </table>
       </div>
     </div>
@@ -233,7 +250,7 @@
       <button type="button" class="stage-nav prev" data-step-view="-1" aria-label="Previous image">‹</button>
       <button type="button" class="stage-nav next" data-step-view="1" aria-label="Next image">›</button>
       <button type="button" class="stage-zoom" data-zoom aria-label="Enlarge image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-      <span class="scale-note">${ICONS.ruler}${CAPTIONS[S.view] || 'Product photo'} · ${p.dims.h} × ${p.dims.w} × ${p.dims.d} mm</span>`;
+      <span class="scale-note">${ICONS.ruler}${p.dims ? CAPTIONS[S.view] || 'Product photo' : S.view === 'drawing' ? 'Cross-section in mm' : 'Illustration'} · ${esc(DIMS)}</span>`;
     stage.classList.toggle('is-drawing', S.view === 'drawing' || S.view === 'scale');
     $$('#gallery [data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
   }
