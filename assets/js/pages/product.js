@@ -233,7 +233,7 @@
     drawing: 'Dimension drawing, all measurements in mm',
   };
   const viewSVG = (v, cls, small) => (v.startsWith('photo')
-    ? `<img class="${cls} prod-photo" src="${esc(PHOTO_LIST[+v.slice(5)])}" alt="${esc(fullName)}" ${small ? 'loading="lazy"' : ''}>`
+    ? PAR.photoImg(PHOTO_LIST[+v.slice(5)], cls, fullName, R.thumb(p, S.finish, { cls, view: p.dims ? 'angle' : 'front', pad: small ? 0.08 : 0.06, reflect: !small }), !small)
     : v === 'drawing'
     ? R.drawing(p)
     : R.thumb(p, S.finish, { cls, view: v, pad: small ? 0.08 : 0.06, reflect: !small }));

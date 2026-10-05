@@ -29,10 +29,20 @@
   const priceOf = (p, vid) => { const v = variantOf(p, vid); return v ? v.price : p.price; };
   const photos = (p) => ((window.PHOTOS || {})[p.id] || []).map((f) => (/^(https?:|\/|assets\/)/.test(f) ? f : `assets/img/products/${f}`));
   /** A product's photo if one is listed in photos.js, otherwise its to-scale illustration. */
+  /** A photo <img> followed by a hidden fallback (illustration) that is revealed if the photo fails to load. */
+  function photoImg(src, cls, alt, fallback, eager) {
+    const fb = String(fallback || '').replace(/^<(\w+)/, '<$1 hidden data-photo-fallback');
+    return `<img class="${cls} prod-photo" src="${esc(src)}" alt="${esc(alt)}"${eager ? '' : ' loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onerror="PAR.photoFail(this)">${fb}`;
+  }
+  function photoFail(img) {
+    const fb = img.nextElementSibling;
+    if (fb && fb.hasAttribute('data-photo-fallback')) fb.removeAttribute('hidden');
+    img.remove();
+  }
   function media(p, fin, opts) {
     opts = opts || {};
     const ph = photos(p)[opts.index || 0];
-    if (ph) return `<img class="${opts.cls || 'prod-img'} prod-photo" src="${esc(ph)}" alt="${esc(p.brand + ' ' + p.name)}" loading="lazy" decoding="async">`;
+    if (ph) return photoImg(ph, opts.cls || 'prod-img', `${p.brand} ${p.name}`, R.thumb(p, fin, opts));
     return R.thumb(p, fin, opts);
   }
 
@@ -426,6 +436,6 @@
 
   window.PAR = {
     $, $$, esc, money, byId, catById, params, productUrl, unitLabel, dimsText, weightText, finishLabel,
-    variantOf, priceOf, photos, media, hasDims, cart, compare, search, card, priceHTML, badgeHTML, toast, init, ICONS, syncCompareUI, store,
+    variantOf, priceOf, photos, media, photoImg, photoFail, hasDims, cart, compare, search, card, priceHTML, badgeHTML, toast, init, ICONS, syncCompareUI, store,
   };
 })();
